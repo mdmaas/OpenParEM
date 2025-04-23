@@ -1,0 +1,13 @@
+# regression test cases for builder
+builder
+
+./differentialPair/diffPair 1
+./differentialPairPMC/diffPair 1
+./microstrip/Lee_microstrip 1
+./rectangularWaveguide/WR90 1
+./stripline/Simonovich_stripline 1
+
+
+
+
+

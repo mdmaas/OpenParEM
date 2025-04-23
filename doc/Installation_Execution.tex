@@ -1,0 +1,350 @@
+\documentclass[titlepage]{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{indentfirst}
+\usepackage[margin=1in]{geometry}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{fancyvrb}
+%\usepackage{graphicx}
+\usepackage{pdfpages}
+\usepackage{subcaption}
+\usepackage{flafter}
+\usepackage[section]{placeins}
+\usepackage{float}
+\hyphenation{wave-guide}
+\renewcommand\_{\textunderscore\linebreak[1]}
+
+\title{OpenParEM Installation and Execution\\\large Version 2.0}
+\date{April 2025}
+\author{Brian Young}
+
+\begin{document}
+
+\begin{titlepage}
+
+   \centering
+   \vspace*{3cm}
+   {\huge\bfseries OpenParEM Installation Manual} \\
+   \vskip1cm
+   {\Large Version 2.1} \\
+   \vskip1cm
+   {\Large April 2025} \\
+   \vskip1cm
+   {\Large Brian Young} \\
+
+   \vfill
+
+   \includegraphics[width=0.5\textwidth]{figures/logo-crop}
+
+   \vspace*{\fill}
+   Copyright \copyright{} 2025 Brian Young. All Rights Reserved.
+\end{titlepage}
+
+%\newpage
+\tableofcontents
+
+\newpage
+\section{Introduction}
+
+OpenParEM consists of the 3D simulator OpenParEM3D and the 2D simulator OpenParEM2D plus some helper tools.  All can be compiled from source or installed as pre-compiled bindaries.
+
+OpenParEM uses command-line tools for solving electromagnetic problems once provided with the necessary input files.  The primary required input files are a mesh describing the geometry, text files describing modes for OpenParEM2D and ports for OpenParEM3D, and a text project control file.  The user is responsible for pulling together the necessary tools to create the needed files.
+
+Assembling a tool flow is a very significant task.  For the development of OpenParEM, a tool flow is developed around FreeCAD \cite{freecad}, gmsh \cite{gmsh}\cite{gmshweb}, and ParaView \cite{paraview}.  The user's manuals describe in detail how to use these tools to complete projects.  For FreeCAD and ParaView, provided Python scripts greatly simplify the effort to set up and review solutions.
+
+\section{Installing Pre-compiled Binaries}
+
+Pre-compiled binaries are available for x86 Linux and do not require administrator priviledges.  Binaries are verified for the following Linux flavors:
+\begin{itemize}[nosep]
+   \item Ubuntu 22.04.5 LTS
+   \item Ubuntu 24.04.2 LTS
+\end{itemize}
+
+The basic steps for installing binaries are listed below.  See the INSTALL file for more details and installation options.
+\begin{itemize}[nosep]
+   \item Download the installation package OpenParEM\_bin\_\textit{version}.tar.gz from \verb+https://openparem.org+
+   \item Unpack the package:
+         \begin{Verbatim}
+$ tar -xf OpenParEM_\bin\_\textit{version}.tar.gz
+         \end{Verbatim}
+   \item Change into the base directory and view the installation instructions:
+         \begin{Verbatim}
+$ cd OpenParEM
+$ more INSTALL
+         \end{Verbatim}
+   \item Set the required PATH and environment variables.  See the INSTALL file for details.
+   \item Install Python scripts for FreeCAD and ParaView:
+         \begin{Verbatim}
+$ cd scripts
+$ OpenParEM_build --without-all
+         \end{Verbatim}
+         The \texttt{--without-all} option installs the scripts while skipping all compilation.
+   \item Test:
+         \begin{Verbatim}
+$ OpenParEM_test
+         \end{Verbatim}
+   \item Installation is complete if both tests report \texttt{pass}
+\end{itemize}
+
+\section{Compiling from Source}
+
+OpenParEM can be compiled for Linux-based operating systems and does not require administrator priviledges if the needed build tools make, g++, and gfortran are already installed. Compilation is verified for the following Linux flavors:
+\begin{itemize}[nosep]
+   \item Ubuntu 22.04.5 LTS
+   \item Ubuntu 24.04.2 LTS
+\end{itemize}
+
+The basic steps for compilation are listed below.  See the INSTALL file for more details and options.
+\begin{itemize}[nosep]
+   \item Download the installation package OpenParEM\_src\_\textit{version}.tar.gz from \verb+https://openparem.org+
+   \item Unpack the package:
+         \begin{Verbatim}
+$ tar -xf OpenParEM\_src\_\textit{version}.tar.gz
+         \end{Verbatim}
+   \item Change into the base directory and view the installation instructions:
+         \begin{Verbatim}
+$ cd OpenParEM
+$ more INSTALL
+         \end{Verbatim}
+   \item Install make, g++, and/or gfortran as needed.
+   \item Change into the scripts directory and compile:
+         \begin{Verbatim}
+$ cd scripts
+$ ./OpenParEM_build --jobs=4 --with-all
+         \end{Verbatim}
+   \item On successful compilation, OpenParEM2D and OpenParEM3D are tested.  If both tests report \texttt{pass}, then compilation is complete.
+   \item Set the required PATH and environment variables.  See the INSTALL file for details.
+   \item Verify that paths and environment variables have been properly set by re-running the tests:
+         \begin{Verbatim}
+$ OpenParEM_test
+         \end{Verbatim}
+   \item If the two tests report \texttt{pass}, then installation is complete.
+\end{itemize}
+
+\section{Flow Tools}
+
+OpenParEM is a command-line tool for running electroagnetic simulations only.  Pre- and post-processing must be handled by other tools.
+
+\subsection{FreeCAD}
+\label{sec:freecad}
+
+The geometry can be built with any number of different CAD tools, with FreeCAD \cite{freecad} being a free and open-source option that works well.  FreeCAD is very powerful, but it does have a significant learning curve that pays off as it is mastered.  FreeCAD is scriptable with Python, enabling the development of helper scripts to simplify the setup of OpenParEM projects.
+
+The easiest installation process is to install FreeCAD from the software management tool provided by the Linux distribution.  Open the tool and search for FreeCAD, and if found, then install.  If an option exists, select the FreeCAD version "An open source parametric 3D CAD modeler".  However, functionality issues with macros may occur, in which case installing from packages is required.
+
+Alternatively, to install FreeCAD from packages, execute
+\begin{verbatim}
+   $ sudo add-apt-repository --enable-source \
+     ppa:freecad-maintainers/freecad-stable && \
+     sudo apt-get update
+   $ sudo apt-get build-dep freecad
+   $ sudo apt-get install freecad
+\end{verbatim}
+Installing from packages is fairly slow and also requires administrator priviledges..
+
+The \texttt{OpenParEM\_build} installation script installs Python scripts to greatly simplify the use of FreeCAD in building OpenParEM projects.  The installed location is \texttt{\$HOME/.FreeCAD/Macro}.  Depending on the version of FreeCAD being used, it may be necessary to set the location for the python scripts using the "User macros location:" box in the "Execute macro window".
+
+To run FreeCAD, execute
+\begin{verbatim}
+   $ freecad &
+\end{verbatim}
+On the first use of FreeCAD, set \texttt{View}$\rightarrow$\texttt{Panels}$\rightarrow$\texttt{Report View} to see messages and errors from the OpenParEM macros.
+
+\subsection{gmsh}
+
+Since OpenParEM uses the finite element method, a mesh of the geometry to be solved is required. An effective free and open-source mesher is gmsh. Output from FreeCAD can be imported into gmsh and meshed, then the mesh can be saved for use by OpenParEM.  Gmsh is scriptable and callable from source, but to date, no automation with gmsh for OpenParEM2D or OpenParEM3D has been implemented.
+
+To install gmsh, download the latest version of gmsh from \verb+https://gmsh.info/)+ to a suitable installation directory \textit{gmsh-install-dir},  then execute
+\begin{verbatim}
+   $ cd gmsh-install-dir
+   $ gunzip gmsh-4.13.1-Linux64.tgz
+   $ tar -xf gmsh-4.13.1-Linux64.tar
+   $ cd $HOME/bin
+   $ ln -s gmsh-install-dir/gmsh-4.13.1-Linux64/bin/gmsh gmsh
+\end{verbatim}
+using the actual downloaded version.  If \$HOME/bin does not exist, then create it and add it to the PATH environment variable.
+
+To run gmsh, execute
+\begin{verbatim}
+   $ gmsh -format msh22 &
+\end{verbatim}
+
+\noindent Note that OpenParEM only works with the msh22 format of gmsh due to library limitations.
+
+\subsection{ParaView}
+\label{sec:paraview}
+
+Both OpenParEM2D and OpenParEM3D can optionally produce outputs to enable viewing of 3D vector fields using ParaView \cite{paraview}, for which there is a free version. It is highly recommended to review the field plots at least initially on any new project.  While OpenParEM can use arbitrarily high order finite elements, ParaView is currently limited to finite element orders of 6 and lower.  As discussed in Sec.~\ref{sec:2Dplots}, a ParaView script is available to automate the building of plots for 2D solutions.
+
+To install ParaView, execute
+\begin{verbatim}
+   $ sudo apt-get install paraview
+   $ sudo apt-get install paraview-doc
+   $ sudo apt-get install python3-paraview
+\end{verbatim}
+\noindent This installation process requires administrator priviledges.
+
+The \texttt{OpenParEM\_build} installation script installs a Python script to greatly simplify the viewing of fields from OpenParEM2D simulations.  The installed location is \texttt{\$HOME/.config/ParaView/Macros}.
+
+To run ParaView, execute
+\begin{verbatim}
+   $ paraview &
+\end{verbatim}
+
+\section{Helper Tools and Scripts}
+
+A number of tools and scripts have been developed to help with setting up projects, project management, code management, and validation.
+
+\subsection{checkError}
+
+This code development script scans the source code and checks error message numbers for missing or duplicate numbers.  It is separately run in the OpenParEMCommon, OpenParEM2D, and OpenParEM3D src directories.  Note that the error number convention is 1XXX for OpenParEMCommon, 2XXX for OpenParEM2D, and 3XXX for OpenParEM3D.  There is no convention for the error number orderings, and they may change from revision to revision.
+
+\subsection{proj\_search}
+
+This is a useful script for finding keywords used in setup files.  The format is
+
+\begin{verbatim}
+   $ proj_search has|hasnot search_term
+\end{verbatim}
+
+When executed, the script recursively searches all files ending with ".proj" that either has the search term or does not.  For example, to list the finite element order used in all projects in the directory tree, execute
+
+\begin{verbatim}
+   $ proj_search has mesh.order
+\end{verbatim}
+
+\noindent The output can be further processed using grep.  To continue the example, to find all projects that use a mesh order of 6, then execute
+\begin{verbatim}
+   $ proj_search has mesh.order | grep 6
+\end{verbatim}
+
+\subsection{builder}
+
+Builder automates the construction of some common transmission line and waveguide types to help with impedance and material studies.  Outputs for use with OpenParEM2D or OpenParEM3D are selectable.  For more information, see the document "builder\_User\_Manual.pdf".
+
+\subsection{waveguide}
+
+Waveguide is an unpolished program for calculating propagation constants and characteristic impedances for rectangular waveguide, rectangular waveguide with symmetry, partially-filled rectangular waveguide, coaxial cable, and coaxial waveguide with symmetry.  The outputs form the basis for the "exact" answers for many of the cases in the OpenParEM2D regression suite.  The only documentation for waveguide is the source code itself.  The OpenParEM2D makefile compiles waveguide but does not install it to any location, but it can be run from the source directory or moved to a convenient location.
+
+\subsection{simplify2D}
+
+simplify2D reduces an OpenParEM2D setup file (*.proj file in the regression suites) to the bare minimum by commenting out inputs that use the default value.  The goal is to help identify what is unique about a particular setup.
+
+\subsection{simplify3D}
+
+simplify3D is the 3D counterpart for OpenParEM3D to simplify2D for OpenParEM2D.
+
+\subsection{process2D and process2D.sh}
+
+Process2D post-processes OpenParEM2D results and compares against test case values to produce pass/fail evaluations.  Test cases are stored in the project directory with the name \textit{project\_name}\_test\_cases.csv.  The script process2D.sh automates the use of process2D.  To run a project called "my\_project" set up with the setup file "my\_project.proj" against its test cases, the general command format is
+
+\begin{verbatim}
+   $ process2D.sh my_project.proj N
+\end{verbatim}
+\noindent where N is the number of cores (or processors) to use for parallel processing.  The pass/fail evaluations are saved in the file "my\_project\_test\_results.csv".
+
+\subsection{process3D and process3D.sh}
+
+Process3D and process3D.sh are the 3D counterparts for OpenParEM3D to process2D and process2D.sh for OpenParEM2D. 
+
+\subsection{regression}
+
+regression automates the execution of the regression suite by running process2D.sh or process3D.sh on a list of projects in the file "regression\_case\_list.txt" in the directories \verb+install-dir/regression/OpenParEM2D+ or \verb+install-dir/regression/OpenParEM3D+ .  See the "README.txt" files in these directories for more information on running regression.
+
+\subsection{OpenParEM2D\_save.py}
+
+OpenParEM2D\_save.py is a Python script that runs in FreeCAD to create the required modes/lines setup file. Building this file by hand is possible but error-prone.  The script enables the necessary setup information to be included directly in the FreeCAD drawing, then running OpenParEM2D\_save.py as a macro produces the needed setup file quickly and accurately.  This script is a "must have" that cannot be overlooked when using FreeCAD.  See the OpenParEM2D user's manual for specifications on its use in FreeCAD.
+
+\subsection{OpenParEM3D\_save.py}
+
+OpenParEM3D\_save.py is a Python script that runs in FreeCAD to create the required ports setup file. Building this file by hand is theoretically possible but is unmanageable even for near-trivial geometries.  The script enables the necessary setup information to be included directly in the FreeCAD drawing, then running OpenParEM3D\_save.py as a macro produces the needed setup file quickly and accurately.  This script is a "must have" that cannot be overlooked when using FreeCAD.  See the OpenParEM3D user's manual for specifications on its use in FreeCAD, which similar but not identical that for OpenParEM2D\_save.py.
+
+\subsection{field\_plot.py}
+\label{sec:2Dplots}
+
+Field\_plot.py is a Python script that runs in ParaView to automate the construction of plots for examining the fields produced from OpenParEM2D simulations.  Highly recommended.
+
+\subsection{tline3}
+
+The program tline3 is a custom solver for the cascade of three transmission lines or waveguides with two shunt capacitors at the transitions, and it is used to check matching 3D setups for accuracy.  The documentation is in the source code.  For examples of use, see the projects \newline\verb+install-dir/regression/OpenParEM3D/WR90/straight-steps/small+\newline and \newline \verb+install-dir/regression/OpenParEM3D/WR90/straight-steps/small-renorm+.
+
+\section{Execution}
+
+OpenParEM2D and OpenParEM3D are command-line tools executed with the following commands when parallel processing
+\begin{verbatim}
+   $ mpirun -q --oversubscribe -np N OpenParEM2D my_project.proj 
+   $ mpirun -q --oversubscribe -np N OpenParEM3D my_project.proj 
+\end{verbatim}
+and 
+\begin{verbatim}
+   $ OpenParEM2D my_project.proj
+   $ OpenParEM3D my_project.proj
+\end{verbatim}
+when running in serial on a single core.  Running on a single core is sometimes convenient when getting a new project up-and-running.
+
+When parallel processing, the \verb+-np+ option specifies the number of cores to use for the simulation, given by \verb+N+.  The \verb+-q+ option suppresses messages from the MPI infrastructure, which are rarely needed.  The \verb+--oversubscribe+ is required with OpenParEM3D when \verb+N+ is more than half the number of available cores.  
+
+The number of cores to specify, \verb+N+, requires some consideration.  If the simulations are being spread across multiple computers, it is assumed that the user knows about MPI processing considerations and no further comments are provided.  For simulations on a single computer, \verb+N+ should always be set to equal to or less than the number of physical cores.  For high-performance computing, there is not sufficient left-over capacity for threads to be utilized.  Depending on the computer, setting \verb+N+ to the number of physical cores can (and probably will) run slower than if \verb+N+ is set to a lower number.  The reason is that the available bandwidth on the CPU itself and to/from memory becomes saturated, so adding more cores causes MPI messages to be delayed due to limited bandwidth, slowing overall performance.  Experimenting with the value of \verb+N+ can identify the value that produces the fastest run times for a given computer.  Different computers have different optimal values of \verb+N+.  See Sec.~\ref{sec:computer} for additional discussion.
+
+When running OpenParEM2D with \verb+N+ cores, \verb+N+ copies of OpenParEM2D are run in parallel with one instance per core.  When running OpenParEM3D with \verb+N+ cores, \verb+N+ copies of OpenParEM3D are run with one instance per core, \textit{plus} \verb+N+ copies of OpenParEM2D are run with one instance per core while ports are being solved.  For some times during the simulation, 2*\verb+N+ cores are being utilized, and if 2\verb+N+~\textgreater~the number of physical cores, then MPI issues an error and exits.  Specifying \verb+--oversubscribe+ allows processing to continue without errors.  OpenParEM3D sleeps while OpenParEM2D runs, so the actual load on the computer is only slightly more than \verb+N+.
+
+\section{Computer Considerations for MPI}
+\label{sec:computer}
+
+Ultimately, bandwidth saturation limits the performance gains available from increasing the number of cores applied to a simulation.  At some number of cores, the performance gains level out then begin to fall as the number of cores increase further.  Maximizing bandwidth is the key to increasing parallel performance with MPI.
+
+For an existing computer, the primary upgrade to improving MPI parallel performance is to fully populate all memory channels with memory sticks.  The memory controller will take advantage of the additional memory channels, improving memory bandwidth and reducing run times.  This works even if the additional memory capacity is not actually needed.  For example, if a computer has two memory channels but only one memory stick, then 1/2 of the memory bandwidth is not being utilized, and adding a second memory stick on the other memory channel can gain significant performance benefits.
+
+If specifying a computer for high-performance computing with MPI, target computers with the largest number of memory channels.  For desktops, the number may max out at 4, while for workstations, the number of channels tend to max out at 8.  A dual-processor workstation will double the number of memory channels since each processor has its own set, and MPI is smart enough to split the processing across the processors to utilize the extra memory channels. As of this writing, a high-end desktop PC will have a single processor with 4 memory channels, while a high-end workstation will have two processors with 16 memory channels.  For parallel processing with MPI, such a workstation handily beats the high-end PC.
+
+Maximum clock rate does play a role, and higher clock speeds do lead to faster run times for a given memory bandwidth.  High-end desktop PCs tend to have higher clock frequencies than workstations, and for simulations using low numbers of cores, the high-end PC may produce faster run times than a high-end workstation.  However, the PC saturates its bandwidth more quickly with increasing core count than the workstation due to memory bandwidth saturation, and at some number of cores, the workstation begins to produce faster run times, then it can continue driving run times down with increasing core counts until its memory bandwidth saturates.  For a workstation, more memory channels trumps higher clock rates.
+
+To recap, populate all memory channels with memory sticks to maximize bandwidth. If specifying a computer, prioritize memory channel counts over clock rates.  If budget allows, go for maximum memory channels \textit{and} maximum clock rate.
+
+\section{Change Log}
+
+\tabcolsep=0.1cm
+\small
+\begin{longtable}[c]{|p{1.5cm}p{3cm}p{11cm}|}
+    \hline
+    \textbf{Version} & \textbf{Date} & Description \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Project} & \textbf{Description} \\
+    \hline
+    \endhead
+   1.0.1 & Sept. 18, 2024 & Initial release \\
+   1.0.2 & Sept. 25, 2024 & - Fixed small memory leak in OpenParEM3D \\
+         &                & - Updated installation documentation for Ubuntu 22.04.5 LTS \\
+         &                & - Added change log to the installation documentation \\
+   1.0.3 & Oct. 5, 2024   & - Fixed a memory cleanup error \\
+         &                & - Ubuntu 24 now supported \\
+         &                & - Updated installation documentation for Ubuntu 24.04.1 LTS \\
+   2.0.0 & Mar. 4, 2025   & - Added detail for clarification \\
+         &                & - Rev'ed the release to 2.0.0 to align with OpenParEM3D \\
+   2.1.0 & April 23, 2025   & - Revamped for the merging of the OpenParEMCommon, OpenParEM2D, and OpenParEM3D into a single project \\
+         &                & - Updated for new build script \\
+    \hline
+\end{longtable}
+
+\begin{thebibliography}{unsrt}
+
+\bibitem{freecad} \verb+https://www.freecad.org+
+
+\bibitem{gmsh} C. Geuzaine and J.-F. Remacle, "Gmsh: a three-dimensional finite element mesh generator with built-in pre- and post-processing facilities," \textit{International Journal for Numerical Methods in Engineering}, 79(11), pp. 1309-1331, 2009.
+
+\bibitem{gmshweb} \verb+https://gmsh.info+
+
+\bibitem{paraview} \verb+https://www.paraview.org+
+
+\bibitem{github} \verb+https://github.com+
+
+\bibitem{virtualbox} \verb+https://www.virtualbox.org+
+
+\end{thebibliography}
+
+
+\end{document}
+

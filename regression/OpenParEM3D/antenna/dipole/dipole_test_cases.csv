@@ -1,0 +1,8 @@
+# ResultDatabase::save_as_test
+dipole_1_0_result,9380000000,magS(dB),1,1,equal,-38.7836605262577,1e-06
+dipole_1_1_result,9380000000,argS(deg),1,1,equal,-25.8683198175383,1e-05
+# PatternDatabase::save_as_test
+dipole_1_2_farfield,9380000000,gain,1,equal,2.2076406436668,1e-07
+dipole_1_3_farfield,9380000000,directivity,1,equal,2.15217780748723,1e-09
+dipole_1_4_farfield,9380000000,radiationEfficiency,1,equal,1.01285268476763,1e-07
+

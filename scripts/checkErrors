@@ -1,0 +1,115 @@
+#!/bin/sh
+
+retVal=0
+print_help=0
+
+if [ $# = 1 ]; then
+   print_help=1
+   if [ "$1" = "-h" -o "$1" = "--help" ]; then
+      retVal=0
+   else
+      retVal=1
+   fi
+fi
+
+if [ $# -gt 1 ]; then
+   print_help=1
+   retVal=1
+fi
+
+if [ $print_help = 1 ]; then
+   echo "Usage: checkErrors"
+   echo ""
+   echo "Run in src directories to check ERROR message numbers." 
+   echo "Returns error for duplicates and bad formatting but not for non-sequential numbers."
+   exit $retVal
+fi
+
+# get the error numbers
+error_list=$(cat *.cpp *.c | grep -o ERROR....\: | cut -c 6-9 | sort | paste -s -d " ")
+
+OIFS="$IFS"
+IFS=" "
+
+set -- $error_list
+
+if [ $# -gt 0 ]; then
+
+   echo "duplicates:"
+   index=1
+   value=$(eval "echo \${${index}}")
+
+   for error in "$@"; do
+      index=`expr $index + 1`
+      if [ $index -le $# ]; then
+         value2=$(eval "echo \${${index}}")
+
+         if [ "$value" = "$value2" ]; then
+            echo "   "$value
+            retVal=1
+         fi
+      fi
+
+      value=$value2
+   done
+
+   echo "non-sequential:"
+   index=1
+   value=$(eval "echo \${${index}}")
+
+   for error in "$@"; do
+      index=`expr $index + 1`
+      if [ $index -le $# ]; then
+         value2=$(eval "echo \${${index}}")
+         value3=$(expr $value2 - 1)
+
+         if [ "$value" != "$value2" ]; then
+            if [ "$value" != "$value3" ]; then
+               echo "   "$value" to "$value2
+            fi
+         fi
+      fi
+
+      value=$value2
+   done
+
+fi
+
+index=1
+echo "first error:"
+echo "   "$(eval "echo \${${index}}")
+echo "last error:"
+index=$#
+echo "   "$(eval "echo \${${index}}")
+echo "total error count:"
+echo "   "$#
+
+IFS="$OIFS"
+
+# incorrect formatting
+
+error_list=$(cat *.cpp *.c | grep -o ERROR...\: | cut -c 6-8 | sort | paste -s -d " ")
+if [ ! -z $error_list ]; then
+   echo "Bad formatting: ERROR"$error_list
+   retVal=1
+fi
+
+error_list=$(cat *.cpp *.c | grep -o ERROR..\: | cut -c 6-7 | sort | paste -s -d " ")
+if [ ! -z $error_list ]; then
+   echo "Bad formatting: ERROR"$error_list
+   retVal=1
+fi
+
+error_list=$(cat *.cpp *.c | grep -o ERROR.\: | cut -c 6-6 | sort | paste -s -d " ")
+if [ ! -z $error_list ]; then
+   echo "Bad formatting: ERROR"$error_list
+   retVal=1
+fi
+
+error_list=$(cat *.cpp *.c | grep -o ERROR\: | cut -c 6 | sort | paste -s -d " ")
+if [ ! -z $error_list ]; then
+   echo "Bad formatting: ERROR"$error_list
+   retVal=1
+fi
+
+exit $retVal

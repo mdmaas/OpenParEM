@@ -1,0 +1,136 @@
+#!/bin/sh
+
+testCaseFile="regression_case_list.txt"
+regressionResultsFile="regression_results.csv"
+currentDirectory=$PWD
+simulator=""
+
+# start time
+start_time="$(date -u +%s)"
+
+#--------------------------------------------------------------------------
+# remove lock files
+#--------------------------------------------------------------------------
+
+find . -name ".*.lock" -exec rm {} \;
+
+#--------------------------------------------------------------------------
+# input processing
+#--------------------------------------------------------------------------
+
+# check for arguments
+if [ $# -gt 0 ]
+then
+   echo "ERROR: command line arguments provided"
+   exit 1
+fi
+
+#--------------------------------------------------------------------------
+# data processing
+#--------------------------------------------------------------------------
+
+# see if the list of projects to process exists
+if [ ! -f $testCaseFile ]
+then
+   echo "ERROR: Test case list file \""$testCaseFile"\" does not exist."
+   exit 1
+fi
+
+# save the old data just in case
+if [ -f $regressionResultsFile ]
+then
+   echo "#Moving "$regressionResultsFile" to "$regressionResultsFile".archive"
+   echo ""
+   mv $regressionResultsFile $regressionResultsFile".archive"
+fi
+
+# loop for each line in testCaseFile and process
+while read -r line
+do
+
+   # skip on blank line
+   if [ "$line" = "" ]
+   then
+      continue
+   fi
+
+   # skip on comment
+   if [ "$(echo $line | cut -c 1)" = "#" ]
+   then
+      continue
+   fi
+
+   # first non-comment line must be simulator type
+
+   if [ "$line" = "OpenParEM2D" ]
+   then
+      simulator=OpenParEM2D
+      continue
+   fi
+
+   if [ "$line" = "OpenParEM3D" ]
+   then
+      simulator=OpenParEM3D
+      continue
+   fi
+
+   if [ "$line" = "builder" ]
+   then
+      simulator=builder
+      continue
+   fi
+
+   # parse line for parameters
+   project="${line% *}"
+   numProc="${line##* }"
+   projectPath="${project%/*}"
+   projectName="${project##*/}"
+   rootName="${projectName%.*}"
+
+   # add some labeling to help find things if necessary
+   echo "#Executing "$project
+   echo "#"$line >> $regressionResultsFile
+
+   # change to the project directory
+   cd $projectPath
+
+   # process
+
+   if [ "$simulator" = "OpenParEM2D" ]
+   then
+      process2D.sh $projectName $numProc < /dev/null
+      if [ -f $rootName"_test_test_results.csv" ]; then
+         cat $rootName"_test_test_results.csv" >> $currentDirectory"/"$regressionResultsFile
+      else
+         echo "ERROR: file "$rootName"_test_test_results.csv does not exist."
+      fi
+   fi
+
+   if [ "$simulator" = "OpenParEM3D" ]
+   then
+      process3D.sh $projectName $numProc < /dev/null
+      if [ -f $rootName"_test_results.csv" ]; then
+         cat $rootName"_test_results.csv" >> $currentDirectory"/"$regressionResultsFile
+      else
+         echo "ERROR: file "$rootName"_test_results.csv does not exist."
+      fi
+   fi
+
+   if [ "$simulator" = "builder" ]
+   then
+      builder_test $projectName >> $currentDirectory"/"$regressionResultsFile
+   fi
+
+   # reset back to the working directory
+   cd $currentDirectory
+   echo ""
+
+done < $testCaseFile
+
+# finish up with elapsed time
+end_time="$(date -u +%s)"
+elapsed=$(( end_time - start_time ))
+echo "Regression elapsed time (s): "$elapsed
+
+
+

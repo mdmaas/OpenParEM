@@ -1,0 +1,38 @@
+to setup a new autotools directory:
+aclocal
+
+to get a very rough starting configure.ac file:
+autoscan
+mv configure.scan configure.ac
+
+to find libraries:
+find . -name "lib*.a" -print
+
+to list executables in library:
+nm lib*.a | grep T
+
+to find an executable in a group of libraries:
+nm -o *.a | grep "T executablename"
+
+to generate configure shell script:
+autoconf
+
+to run the script:
+./configure
+
+to review errors:
+vi config.log
+
+to build the make file:
+automake --add-missing
+
+to build:
+make
+
+
+general sequence:
+aclocal
+autoconf
+automake --add-missing
+./configure
+make

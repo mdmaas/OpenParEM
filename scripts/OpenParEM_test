@@ -1,0 +1,55 @@
+#!/bin/sh
+
+print_help=0
+retval=0
+
+# input processing
+
+if [ $# -eq 1 ]; then
+   if [ $1 = "--help" -o $1 = "-h" ]; then
+      print_help=1
+   fi
+fi
+
+if [ $# -gt 1 ]; then
+   print_help=1
+   retval=1
+fi
+
+if [ $print_help -eq 1 ]; then
+   echo "usage: OPEM_check [-h|--help]"
+   echo ""
+   echo "Runs checks on OpenParEM2D and OpenParEM3D and prints pass/FAIL results."
+   exit $retval
+fi
+
+run_error=0
+
+cd ../regression/OpenParEM2D
+if [ ! $? -eq 0 ]; then
+   echo "ERROR: OpenParEM_test must be run from the scripts directory."
+   exit 1
+fi
+
+OpenParEM2D_test
+if [ ! $? -eq 0 ]; then
+   run_error=1
+fi
+
+cd ../OpenParEM3D
+if [ ! $? -eq 0 ]; then
+   echo "ERROR: OpenParEM_test must be run from the scripts directory."
+   exit 1
+fi
+
+OpenParEM3D_test
+if [ ! $? -eq 0 ]; then
+   run_error=1
+fi
+
+if [ $run_error -eq 1 ]; then
+   echo "ERROR: Failed to run one or more installation checks."
+   exit 1
+fi
+
+exit 0

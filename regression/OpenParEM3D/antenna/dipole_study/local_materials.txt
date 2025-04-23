@@ -1,0 +1,18 @@
+#OpenParEMmaterials 1.0
+
+Material
+   name=fill
+   Temperature
+      temperature=any
+      Frequency
+         frequency=any
+         er=1.08
+         mur=1
+         tand=0
+         Rz=0
+      EndFrequency
+   EndTemperature
+   Source
+   EndSource
+EndMaterial
+

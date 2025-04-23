@@ -1,0 +1,1135 @@
+#!/bin/sh
+
+#----------------------------------------------------
+# downloaded packages included with this distribution
+#----------------------------------------------------
+
+# flex, bison, and Open MPI are not typically installed on Linux systems.  To avoid
+# having to install them with root priviledges, they are compiled here.
+
+# www.gnu.org
+bison="bison-3.8.tar.gz"
+zlib="zlib-1.3.1.tar.gz"
+flex="flex-2.6.4.tar.gz"
+hwloc="hwloc-2.11.2.tar.gz"
+libevent="libevent-2.1.12-stable.tar.gz"
+pmix="pmix-5.0.7.tar.gz"
+prrte="prrte-3.0.9.tar.gz"
+
+# www.open-mpi.org
+openmpi="openmpi-4.1.8.tar.gz"
+
+# Compile HYPRE separately because PETSc would compile it for complex, which
+# is incompatible with MFEM.
+# https://github.com/hypre-space/hypre
+hypre="hypre-2.32.0.tar.gz"
+
+# https://ftp.mcs.anl.gov/pub/petsc/release-snapshots/
+petsc="petsc-3.23.0.tar.gz"
+
+# Compile MFEM separately from PETSc to maintain a little more flexibility
+# in using non-released versions of MFEM, if needed.
+# www.mfem.org
+mfem="mfem-4.8.tgz"
+
+#----------------------------------------------------
+# packages downloaded by petsc
+#----------------------------------------------------
+
+fblaslapack="https://bitbucket.org/petsc/pkg-fblaslapack/get/v3.4.2-p3.tar.gz"
+metis="https://bitbucket.org/petsc/pkg-metis/get/v5.1.0-p12.tar.gz"
+mumps="https://web.cels.anl.gov/projects/petsc/download/externalpackages/MUMPS_5.7.3.tar.gz"
+scalapack="https://github.com/Reference-ScaLAPACK/scalapack/archive/v2.2.2.tar.gz"
+scotch="https://gitlab.inria.fr/scotch/scotch/-/archive/v7.0.6/scotch-v7.0.6.tar.gz"
+cmake="https://github.com/Kitware/CMake/releases/download/v3.31.6/cmake-3.31.6.tar.gz"
+
+#----------------------------------------------------
+# packages to install
+#----------------------------------------------------
+
+with_bison=0
+with_zlib=0
+with_flex=0
+with_hwloc=0
+with_libevent=0
+with_pmix=0
+with_prrte=0
+with_openmpi=0
+with_hypre=1
+with_cmake=0
+with_petsc=1
+with_mfem=1
+with_OpenParEM=1
+with_all=0
+
+#----------------------------------------------------
+# library types
+#----------------------------------------------------
+
+# openmpi requires shared build at this time
+
+enable_static=no
+enable_shared=yes
+
+#----------------------------------------------------
+# check that the script is being run from scripts
+#----------------------------------------------------
+
+if [ ! -f "OpenParEM_build" ]; then
+   echo "ERROR: OpenParEM_build must be run from the scripts directory"
+   exit 1
+fi
+
+#----------------------------------------------------
+# check for installed tools
+#----------------------------------------------------
+
+missing_requirement=0
+
+which make > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+   echo "ERROR: \"make\" must be installed on the system to compile OpenParEM"
+   missing_requirement=1
+fi
+
+which g++ > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+   echo "ERROR: \"g++\" must be installed on the system to compile OpenParEM"
+   missing_requirement=1
+fi
+
+which gfortran > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+   echo "ERROR: \"gfortran\" must be installed on the system to compile OpenParEM"
+   missing_requirement=1
+fi
+
+if [ "$missing_requirement" = "1" ]; then
+   exit 1
+fi
+
+has_cmake=0 
+which cmake > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+   has_cmake=1
+fi
+
+has_bison=0
+which bison > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+   has_bison=1
+fi
+
+has_flex=0
+which flex > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+   has_flex=1
+fi
+
+has_mpi=0
+which mpirun > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+   has_mpi=1
+fi
+
+#----------------------------------------------------
+# subroutines
+#----------------------------------------------------
+
+scripts_dir=$PWD
+
+# unpack file name for external packages
+FILE_base=""
+
+# unpack a tarball and cd to the directory
+unpack_and_enter() {
+
+   FILE=$1
+
+   # check for existence
+   if [ ! -f "$FILE" ]; then
+      echo "ERROR: distribution \"""$FILE""\" not found"
+      exit 1
+   fi
+
+   # determine type and base name
+
+   is_identified=0
+
+   is_targz=0
+   if [ "$is_identified" = "0" ]; then
+      FILE_base=${FILE%.tar.gz}
+      if [ "$FILE_base" != "$FILE" ]; then
+         is_targz=1
+         is_identified=1
+      fi
+   fi
+
+   is_tgz=0
+   if [ "$is_identified" = "0" ]; then
+      FILE_base=${FILE%.tgz}
+      if [ "$FILE_base" != "$FILE" ]; then
+         is_tgz=1
+         is_identified=1
+      fi
+   fi
+
+   is_zip=0
+   if [ "$is_identified" = "0" ]; then
+      FILE_base=${FILE%.zip}
+      if [ "$FILE_base" != "$FILE" ]; then
+         is_zip=1
+         is_identified=1
+      fi
+   fi
+
+   if [ "$is_identified" = "0" ]; then
+      echo "ERROR: unrecognized distribution for \"""$FILE""\""
+      exit 1
+   fi
+
+   # remove any previously unpacked instance
+   if [ -d "$FILE_base" ]; then
+      rm -Rf "$FILE_base"
+      if [ $? -ne 0 ]; then
+         echo "ERROR: unable to remove directory \"""$FILE_base""\""
+      fi
+   fi
+
+   # unpack
+
+   if [ "$is_targz" = "1" -o "$is_tgz" = "1" ]; then
+      tar -xf "$FILE"
+      if [ $? -ne 0 ]; then
+         echo "ERROR: failure to unpack \"""$FILE""\""
+         exit 1
+      fi
+   fi
+
+   if [ "$is_zip" = "1" ]; then
+      unzip "$FILE"
+      if [ $? -ne 0 ]; then
+         echo "ERROR: failure to unpack \"""$FILE""\""
+         exit 1
+      fi
+   fi
+
+   # make sure it unpacked
+   if [ ! -d "$FILE_base" ]; then
+      echo "ERROR: failure to unpack \"""$FILE""\""
+      exit 1
+   fi
+
+   cd "$FILE_base"
+}
+
+remove_base_directory() {
+   if [ -d "$FILE_base" ]; then
+      rm -Rf "$FILE_base"
+      if [ $? -ne 0 ]; then
+         echo "ERROR: failed to remove directory \"""$FILE_base""\""
+         exit 1
+      fi
+   else 
+      echo "ERROR: failed to find directory \"""$FILE_base""\""
+      exit 1
+   fi
+}
+
+#----------------------------------------------------
+# variables
+#----------------------------------------------------
+
+# start time
+start_time="$(date -u +%s)"
+
+print_help=0
+retval=0
+show_setup=0
+clean_in_place=0
+cd ..
+install_path=$PWD
+cd "$scripts_dir"
+jobs=1
+
+#----------------------------------------------------
+# input processing
+#----------------------------------------------------
+
+for arg in "$@"; do
+   if [ "$arg" = "-H" -o "$arg" = "--help" ]; then
+      print_help=1
+   else
+      keyword=${arg%=*}
+      value=${arg#"$keyword="} 
+
+      if [ "$keyword" = "--prefix" ]; then
+         install_path=$value
+      elif [ "$keyword" = "--jobs" ]; then
+         jobs=$value
+#      elif [ "$arg" = "--static" ]; then
+#         enable_static=yes
+#         enable_shared=no
+      elif [ "$arg" = "--without-all" ]; then
+         with_bison=0
+         with_zlib=0
+         with_flex=0
+         with_hwloc=0
+         with_libevent=0
+         with_pmix=0
+         with_prrte=0
+         with_openmpi=0
+         with_hypre=0
+         with_cmake=0
+         with_petsc=0
+         with_mfem=0
+         with_OpenParEM=0
+      elif [ "$arg" = "--with-all" ]; then
+         with_all=1
+      elif [ "$arg" = "--show-setup" ]; then
+         show_setup=1
+      elif [ "$arg" = "--clean-in-place" ]; then
+         clean_in_place=1
+      elif [ "$arg" = "--with-bison" ]; then
+         with_bison=1
+      elif [ "$keyword" = "--with-bison" ]; then
+         with_bison=1
+         bison=$value
+      elif [ "$arg" = "--without-bison" ]; then
+         with_bison=0
+      elif [ "$arg" = "--with-zlib" ]; then
+         with_zlib=1
+      elif [ "$keyword" = "--with-zlib" ]; then
+         with_zlib=1
+         zlib=$value
+      elif [ "$arg" = "--without-zlib" ]; then
+         with_zlib=0
+      elif [ "$arg" = "--with-flex" ]; then
+         with_flex=1
+      elif [ "$keyword" = "--with-flex" ]; then
+         with_flex=1
+         flex=$value
+      elif [ "$arg" = "--without-flex" ]; then
+         with_flex=0
+      elif [ "$arg" = "--with-hwloc" ]; then
+         with_hwloc=1
+      elif [ "$keyword" = "--with-hwloc" ]; then
+         with_hwloc=1
+         hwloc=$value
+      elif [ "$arg" = "--without-hwloc" ]; then
+         with_hwloc=0
+      elif [ "$arg" = "--with-libevent" ]; then
+         with_libevent=1
+      elif [ "$keyword" = "--with-libevent" ]; then
+         with_libevent=1
+         libevent=$value
+      elif [ "$arg" = "--without-libevent" ]; then
+         with_libevent=0
+      elif [ "$arg" = "--with-pmix" ]; then
+         with_pmix=1
+      elif [ "$keyword" = "--with-pmix" ]; then
+         with_pmix=1
+         pmix=$value
+      elif [ "$arg" = "--without-pmix" ]; then
+         with_pmix=0
+      elif [ "$arg" = "--with-prrte" ]; then
+         with_prrte=1
+      elif [ "$keyword" = "--with-prrte" ]; then
+         with_prrte=1
+         prrte=$value
+      elif [ "$arg" = "--without-prrte" ]; then
+         with_prrte=0
+      elif [ "$arg" = "--with-openmpi" ]; then
+         with_openmpi=1
+      elif [ "$keyword" = "--with-openmpi" ]; then
+         with_openmpi=1
+         openmpi=$value
+      elif [ "$arg" = "--without-openmpi" ]; then
+         with_openmpi=0
+      elif [ "$arg" = "--with-hypre" ]; then
+         with_hypre=1
+      elif [ "$keyword" = "--with-hypre" ]; then
+         with_hypre=1
+         hypre=$value
+      elif [ "$arg" = "--without-hypre" ]; then
+         with_hypre=0
+      elif [ "$arg" = "--with-cmake" ]; then
+         with_cmake=1
+      elif [ "$keyword" = "--with-cmake" ]; then
+         with_cmake=1
+         cmake=$value
+      elif [ "$arg" = "--without-cmake" ]; then
+         with_cmake=0
+      elif [ "$arg" = "--with-petsc" ]; then
+         with_petsc=1
+      elif [ "$keyword" = "--with-petsc" ]; then
+         with_petsc=1
+         petsc=$value
+      elif [ "$arg" = "--without-petsc" ]; then
+         with_petsc=0
+      elif [ "$arg" = "--with-mfem" ]; then
+         with_mfem=1
+      elif [ "$keyword" = "--with-mfem" ]; then
+         with_mfem=1
+         mfem=$value
+      elif [ "$arg" = "--without-mfem" ]; then
+         with_mfem=0
+      elif [ "$arg" = "--with-OpenParEM" ]; then
+         with_OpenParEM=1
+      elif [ "$arg" = "--without-OpenParEM" ]; then
+         with_OpenParEM=0
+      else
+         echo "ERROR: unrecognized option ""$arg"
+         exit 1
+      fi
+   fi
+done
+
+#----------------------------------------------------
+# print help
+#----------------------------------------------------
+
+if [ $print_help -eq 1 ]; then
+   echo "Usage: OpenParEM_build [OPTIONS]"
+   echo "Builds the OpenParEM distribution when run from the scripts directory."
+   echo ""
+   echo "The build tools make, g++, and gfortran must be installed on the system."
+   echo ""
+   echo "For an in-place build with the results placed in the distribution tree, execute as"
+   echo "   shell: OpenParEM_build --jobs=N --with-all"
+   echo "If OpenParEM_build has already been run, use the --clean-in-place option to delete"
+   echo "any prior results before compiling."
+   echo ""
+   echo "For an out-of-place build in a given install directory, execute as"
+   echo "   shell: OpenParEM_build --jobs=N --prefix=install_dir --with-all"
+   echo "where the installation directory must already exist.  Note that there is no option for"
+   echo "deleting prior results on additional build runs."
+   echo ""
+   echo "Omit the --with-all option, then if cmake, flex, or bison are found using a search with"
+   echo "the existing PATH, they are compiled and installed from source."
+   echo ""
+   echo "If an MPI development distribution is not found at /usr/bin, /usr/lib, and /usr/include, then"
+   echo "Open MPI is compiled and installed from source. An option can be applied to force the compilation."
+   echo ""
+   echo "After compiling, tests are performed on OpenParEM2D and OpenParEM3D.  If these pass,"
+   echo "then compilation is successful and OpenParEM is ready to use.  However, it is still required"
+   echo "to set the PATH and the environment variable for OMP_NUM_THREADS=1."
+   echo ""
+   echo "common OPTIONS:"
+   echo "  --help or -H             print this help message and exit"
+   echo "  --prefix=path            set the install path to the given path.  Default is the current working directory"
+   echo "  --jobs=integer           execute make with parallel processing [i.e. make -j integer]. Default=1"
+#   echo "  --shared                  build using shared libraries. Default is to build static libraries whenever possible"
+   echo "  --clean-in-place         remove any prior in-place installation"
+   echo "  --with-all               compile everything to minimize potential compatibility issues"
+   echo "  --show-setup             show the compilation setup and exit"
+   echo ""
+   echo "advanced OPTIONS:"
+   echo "  --without-all            skip compiling all; generally followed by --with-* options to add back in something to compile"
+   echo "  --with-bison[=file]      compile bison using the default distribution or the provided file"
+   echo "  --without-bison          skip compiling bison"
+   echo "  --with-zlib[=file]       compile libzlib using the default distribution or the provided file"
+   echo "  --without-zlib           skip compiling libzlib"
+   echo "  --with-flex[=file]       compile flex using the default distribution or the provided file"
+   echo "  --without-flex           skip compiling flex; flex must be installed on the system"
+   echo "  --with-hwloc[=file]      compile libhwloc using the default distribution or the provided file"
+   echo "  --without-hwloc          skip compiling libhwloc"
+   echo "  --with-libevent[=file]   compile libevent using the default distribution or the provided file"
+   echo "  --without-libevent       skip compiling libevent"
+   echo "  --with-pmix[=file]       compile libpmix using the default distribution or the provided file"
+   echo "  --without-pmix           skip compiling libpmix"
+   echo "  --with-prrte[=file]      compile libprrte using the default distribution or the provided file"
+   echo "  --without-prrte          skip compiling libprrte"
+   echo "  --with-openmpi[=file]    compile OpenMPI and related libraries using the default distribution or the provided file"
+   echo "  --without-openmpi        skip compiling OpenMPI and related libraries; MPI plus development libraries must be installed on the system"
+   echo "  --with-hypre[=file]      compile libHYPRE using the default distribution or the provided file"
+   echo "  --without-hypre          skip compiling libHYPRE"
+   echo "  --with-cmake[=file]      compile cmake during petsc compilation"
+   echo "  --without-cmake          skip compiling cmake: cmake must be installed on the system"
+   echo "  --with-petsc[=file]      compile PETSc and related libraries using the default distribution or the provided file"
+   echo "  --without-petsc          skip compiling PETSc and related libraries"
+   echo "  --with-mfem[=file]       compile libmfem using the default distribution or the provided file"
+   echo "  --without-mfem           skip compiling libmfem"
+   echo "  --with-OpenParEM         compile OpenParEM"
+   echo "  --without-OpenParEM      skip compiling OpenParEM"
+   exit $retval
+fi
+
+echo "#------------------------------------------------------------------------------------"
+echo "# OpenParEM_build: setup"
+echo "#------------------------------------------------------------------------------------"
+
+if [ "$has_cmake" = "0" ]; then
+   with_cmake=1
+fi
+
+if [ "$has_bison" = "0" -o "$with_bison" = "1" ]; then
+   with_bison=1
+fi
+
+if [ "$has_flex" = "0" -o "$with_flex" = "1" ]; then
+   with_bison=1
+   with_zlib=1
+   with_flex=1
+fi
+
+if [ "$with_hypre" = "1" ]; then
+   with_zlib=1
+fi
+
+if [ "$has_mpi" = "0" -o "$with_openmpi" = "1" ]; then
+   with_hwloc=1
+   with_libevent=1
+   with_pmix=1
+   with_prrte=1
+   with_openmpi=1
+fi
+
+if [ "$with_all" = "1" ]; then
+   with_bison=1
+   with_zlib=1
+   with_flex=1
+   with_hwloc=1
+   with_libevent=1
+   with_pmix=1
+   with_prrte=1
+   with_openmpi=1
+   with_hypre=1
+   with_cmake=1
+   with_petsc=1
+   with_mfem=1
+   with_OpenParEM=1
+fi
+
+export PATH="$install_path/bin:$scripts_dir:$PATH"
+export OMP_NUM_THREADS=1
+
+echo "scripts_dir=$scripts_dir"
+echo "install_path=$install_path"
+echo "PATH=$PATH"
+echo "OMP_NUM_THREADS=$OMP_NUM_THREADS"
+echo "jobs=$jobs"
+
+if [ "$with_bison" = "1" ]; then
+   echo "with-bison=$with_bison using $bison"
+else
+   echo "with-bison=$with_bison"
+fi
+
+if [ "$with_zlib" = "1" ]; then
+   echo "with-zlib=$with_zlib using $zlib"
+else
+   echo "with-zlib=$with_zlib"
+fi
+
+if [ "$with_flex" = "1" ]; then
+   echo "with-flex=$with_flex using $flex"
+else
+   echo "with-flex=$with_flex"
+fi
+
+if [ "$with_hwloc" = "1" ]; then
+   echo "with-hwloc=$with_hwloc using $hwloc"
+else
+   echo "with-hwloc=$with_hwloc"
+fi
+
+if [ "$with_libevent" = "1" ]; then
+   echo "with-libevent=$with_libevent using $libevent"
+else
+   echo "with-libevent=$with_libevent"
+fi
+
+if [ "$with_pmix" = "1" ]; then
+   echo "with-pmix=$with_pmix using $pmix"
+else
+   echo "with-pmix=$with_pmix"
+fi
+
+if [ "$with_prrte" = "1" ]; then
+   echo "with-prrte=$with_prrte using $prrte"
+else
+   echo "with-prrte=$with_prrte"
+fi
+
+if [ "$with_openmpi" = "1" ]; then
+   echo "with-openmpi=$with_openmpi using $openmpi"
+else
+   echo "with-openmpi=$with_openmpi"
+fi
+
+if [ "$with_hypre" = "1" ]; then
+   echo "with-hypre=$with_hypre using $hypre"
+else
+   echo "with-hypre=$with_hypre"
+fi
+
+if [ "$with_petsc" = "1" ]; then
+   echo "with-petsc=$with_petsc using $petsc"
+   echo "   including:"
+   echo "      fblaslapack=$fblaslapack"
+   echo "      mumps=$mumps"
+   echo "      scalapack=$scalapack"
+   echo "      scotch=$scotch"
+
+   if [ "$with_cmake" = "1" ]; then
+      echo "   with-cmake=$with_cmake using $cmake"
+   else
+      echo "   with-cmake=$with_cmake"
+   fi
+else
+   echo "with-petsc=$with_petsc"
+fi
+
+if [ "$with_mfem" = "1" ]; then
+   echo "with-mfem=$with_mfem using $mfem"
+else
+   echo "with-mfem=$with_mfem"
+fi
+
+echo "with-OpenParEM=$with_OpenParEM"
+
+if [ "$show_setup" = "1" ]; then
+   exit 0
+fi
+
+#----------------------------------------------------
+# copy Python scripts for FreeCAD and ParaView
+#----------------------------------------------------
+
+# FreeCAD
+
+cd $HOME
+if [ ! -d ".FreeCAD" ]; then
+   mkdir ".FreeCAD"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: failed to create $HOME/.FreeCAD directory"
+      exit 1
+   fi
+fi
+
+cd ".FreeCAD"
+
+if [ ! -d "Macro" ]; then
+   mkdir "Macro"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: failed to create $HOME/.FreeCAD/Macro directory"
+      exit 1
+   fi
+fi
+
+cd "$scripts_dir"/FreeCAD
+if [ $? -ne 0 ]; then
+   echo "OpenParEM_ERROR: failed to cd to $scripts_dir/FreeCAD"
+   exit 1
+fi
+
+cp * "$HOME/.FreeCAD/Macro"
+
+# ParaView
+
+cd $HOME
+if [ ! -d ".config" ]; then
+   mkdir ".config"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: failed to create $HOME/.config directory"
+      exit 1
+   fi
+fi
+
+cd ".config"
+
+if [ ! -d "ParaView" ]; then
+   mkdir "ParaView"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: failed to create $HOME/.config/ParaView directory"
+      exit 1
+   fi
+fi
+
+cd "ParaView"
+
+if [ ! -d "Macros" ]; then
+   mkdir "Macros"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: failed to create $HOME/.config/ParaView/Macros directory"
+      exit 1
+   fi
+fi
+
+cd "$scripts_dir"/ParaView
+if [ $? -ne 0 ]; then
+   echo "OpenParEM_ERROR: failed to cd to $scripts_dir/ParaView"
+   exit 1
+fi
+
+cp * "$HOME/.config/ParaView/Macros"
+
+cd "$scripts_dir"
+
+#----------------------------------------------------
+# builds
+#----------------------------------------------------
+
+cd ..
+
+if [ "$clean_in_place" = "1" ]; then
+   rm -Rf bin etc include lib man sbin share
+fi
+
+# bison
+if [ "$with_bison" = "1" ]; then
+
+   echo "#------------------------------------------------------------------------------------"
+   echo "# OpenParEM_build: bison"
+   echo "#------------------------------------------------------------------------------------"
+
+   cd external_packages
+
+   unpack_and_enter "$bison"
+
+   ./configure --prefix="$install_path"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: bison failed to configure"
+      exit 1
+   fi
+
+   make -j "$jobs"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: bison failed to make"
+      exit 1
+   fi
+
+   make install
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: ERROR: bison failed to install"
+      exit 1
+   fi
+
+   cd ..
+   remove_base_directory
+   cd ..
+fi
+
+# zlib
+if [ "$with_zlib" = "1" ]; then
+
+   echo "#------------------------------------------------------------------------------------"
+   echo "# OpenParEM_build: zlib"
+   echo "#------------------------------------------------------------------------------------"
+
+   cd external_packages
+
+   unpack_and_enter "$zlib"
+
+   if [ "$enable_static" = "yes" ]; then 
+      ./configure --static --prefix="$install_path"
+      if [ $? -ne 0 ]; then
+         echo "OpenParEM_ERROR: zlib failed to configure"
+         exit 1
+      fi
+   else
+      ./configure --prefix="$install_path"
+      if [ $? -ne 0 ]; then
+         echo "OpenParEM_ERROR: zlib failed to configure"
+         exit 1
+      fi
+   fi
+
+   make -j "$jobs"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: zlib failed to make"
+      exit 1
+   fi
+
+   make install
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: ERROR: zlib failed to install"
+      exit 1
+   fi
+
+   cd ..
+   remove_base_directory
+   cd ..
+fi
+
+# flex
+if [ "$with_flex" = "1" ]; then
+
+   echo "#------------------------------------------------------------------------------------"
+   echo "# OpenParEM_build: flex"
+   echo "#------------------------------------------------------------------------------------"
+
+   cd external_packages
+
+   unpack_and_enter "$flex"
+
+   ./configure --prefix="$install_path" --enable-static="$enable_static" --enable-shared="$enable_shared"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: flex failed to configure"
+      exit 1
+   fi
+
+   make -j "$jobs"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: flex failed to make"
+      exit 1
+   fi
+
+   make install
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: ERROR: flex failed to install"
+      exit 1
+   fi
+
+   cd ..
+   remove_base_directory
+   cd ..
+fi
+
+# hwloc
+if [ "$with_hwloc" = "1" ]; then
+
+   echo "#------------------------------------------------------------------------------------"
+   echo "# OpenParEM_build: hwloc"
+   echo "#------------------------------------------------------------------------------------"
+
+   cd external_packages
+
+   unpack_and_enter "$hwloc"
+
+   ./configure --prefix="$install_path" --enable-static="$enable_static" --enable-shared="$enable_shared"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: hwloc failed to configure"
+      exit 1
+   fi
+
+   make -j "$jobs"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: hwloc failed to make"
+      exit 1
+   fi
+
+   make install
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: ERROR: hwloc failed to install"
+      exit 1
+   fi
+
+   cd ..
+   remove_base_directory
+   cd ..
+fi
+
+# libevent
+if [ "$with_libevent" = "1" ]; then
+
+   echo "#------------------------------------------------------------------------------------"
+   echo "# OpenParEM_build: libevent"
+   echo "#------------------------------------------------------------------------------------"
+
+   cd external_packages
+
+   unpack_and_enter "$libevent"
+
+   ./configure --prefix="$install_path" --enable-static="$enable_static" --enable-shared="$enable_shared" --disable-openssl
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: libevent failed to configure"
+      exit 1
+   fi
+
+   make -j "$jobs"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: libevent failed to make"
+      exit 1
+   fi
+
+   make install
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: libevent failed to install"
+      exit 1
+   fi
+
+   cd ..
+   remove_base_directory
+   cd ..
+fi
+
+# pmix
+if [ "$with_pmix" = "1" ]; then
+
+   echo "#------------------------------------------------------------------------------------"
+   echo "# OpenParEM_build: pmix"
+   echo "#------------------------------------------------------------------------------------"
+
+   cd external_packages
+
+   unpack_and_enter "$pmix"
+
+   ./configure CFLAGS=-fPIC --prefix="$install_path" --enable-static="$enable_static" --enable-shared="$enable_shared" --with-libevent="$install_path"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: pmix failed to configure"
+      exit 1
+   fi
+
+   make -j "$jobs"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: pmix failed to make"
+      exit 1
+   fi
+
+   make install
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: pmix failed to install"
+      exit 1
+   fi
+
+   cd ..
+   remove_base_directory
+   cd ..
+fi
+
+# prrte
+if [ "$with_prrte" = "1" ]; then
+
+   echo "#------------------------------------------------------------------------------------"
+   echo "# OpenParEM_build: prrte"
+   echo "#------------------------------------------------------------------------------------"
+
+   cd external_packages
+
+   unpack_and_enter "$prrte"
+
+   ./configure --prefix="$install_path" --enable-static="$enable_static" --enable-shared="$enable_shared" --with-pmix="$install_path" --with-libevent="$install_path" --with-hwloc="$install_path"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: prrte failed to configure"
+      exit 1
+   fi
+
+   make -j "$jobs"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: prrte failed to make"
+      exit 1
+   fi
+
+   make install
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: prrte failed to install"
+      exit 1
+   fi
+
+   cd ..
+   remove_base_directory
+   cd ..
+fi
+
+# openmpi
+if [ "$with_openmpi" = "1" ]; then
+
+   echo "#------------------------------------------------------------------------------------"
+   echo "# OpenParEM_build: openmpi"
+   echo "#------------------------------------------------------------------------------------"
+
+   cd external_packages
+
+   unpack_and_enter "$openmpi"
+
+   ./configure --prefix="$install_path" --enable-static="$enable_static" --enable-shared="$enable_shared" --with-libevent="$install_path" --with-hwloc="$install_path" --with-pmix="$install_path"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: openmpi failed to configure"
+      exit 1
+   fi
+
+   make -j "$jobs"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: openmpi failed to make"
+      exit 1
+   fi
+
+   make install
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: openmpi failed to install"
+      exit 1
+   fi
+
+   cd ..
+   remove_base_directory
+   cd ..
+fi
+
+# hypre
+if [ "$with_hypre" = "1" ]; then
+
+   echo "#------------------------------------------------------------------------------------"
+   echo "# OpenParEM_build: hypre"
+   echo "#------------------------------------------------------------------------------------"
+
+   cd external_packages
+
+   unpack_and_enter "$hypre"
+
+   cd src
+
+   ./configure --prefix="$install_path" --enable-shared="$enable_shared"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: hypre failed to configure"
+      exit 1
+   fi
+
+   make -j "$jobs" install
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: hypre failed to make and install"
+      exit 1
+   fi
+
+   cd ../..
+   remove_base_directory
+   cd ..
+fi
+
+# petsc
+if [ "$with_petsc" = "1" ]; then
+
+   echo "#------------------------------------------------------------------------------------"
+   echo "# OpenParEM_build: petsc"
+   echo "#------------------------------------------------------------------------------------"
+
+   cd external_packages
+
+   unpack_and_enter "$petsc"
+
+   if [ -d linux_complex ]; then
+      rm -Rf linux_complex
+      if [ $? -ne 0 ]; then
+         echo "OpenParEM_ERROR: petsc failed to remove linux_complex"
+         exit 1
+      fi
+   fi
+
+   cmake_option="no"
+   if [ "$with_cmake" = "1" ]; then
+      cmake_option="$cmake"
+   fi
+
+#   mkdir temp_dir
+#   --with-packages-download-dir=temp_dir
+
+   ./configure --prefix="$install_path" PETSC_ARCH=linux_complex --with-clean --with-shared-libraries="$enable_shared" --with-debugging=0 --with-single-library=0 --with-scalar-type=complex --with-precision=double --with-64-bit-indices --download-cmake="$cmake_option" --download-zlib=no --download-openmpi=no --download-bison=no --download-hypre=no --download-metis="$metis" --download-slepc=yes --download-mfem=no --download-mumps="$mumps" --download-scalapack="$scalapack" --download-ptscotch="$scotch" --download-fblaslapack="$fblaslapack" --with-fortran-bindings=1 --COPTFLAGS="-O3" --CXXOPTFLAGS="-O3" --FOPTFLAGS="-O3"
+
+
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: petsc failed to configure"
+      exit 1
+   fi
+
+   make -j "$jobs" PETSC_DIR="$PWD" PETSC_ARCH=linux_complex all
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: petsc failed to make"
+      exit 1
+   fi
+
+   make PETSC_DIR="$PWD" PETSC_ARCH=linux_complex install
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: petsc failed to install"
+      exit 1
+   fi
+
+   make PETSC_DIR="$install_path" PETSC_ARCH="" check
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: petsc failed check"
+      exit 1
+   fi
+
+   make SLEPC_DIR="$install_path" PETSC_DIR="$install_path" PETSC_ARCH="" check
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: slepc failed check"
+      exit 1
+   fi
+
+   cd ..
+   remove_base_directory
+   cd ..
+fi
+
+# mfem
+if [ "$with_mfem" = "1" ]; then
+
+   echo "#------------------------------------------------------------------------------------"
+   echo "# OpenParEM_build: mfem"
+   echo "#------------------------------------------------------------------------------------"
+
+   cd external_packages
+
+   unpack_and_enter "$mfem"
+
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: mfem failed to configure"
+      exit 1
+   fi
+
+   make parallel -j "$jobs" MFEM_USE_METIS_5=YES
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: mfem failed to make"
+      exit 1
+   fi
+
+   make PREFIX="$install_path" install
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: mfem failed to install"
+      exit 1
+   fi
+
+   cd ..
+   remove_base_directory
+   cd ..
+fi
+
+# OpenParEM
+if [ "$with_OpenParEM" = "1" ]; then
+
+   echo "#------------------------------------------------------------------------------------"
+   echo "# OpenParEM_build: OpenParEM"
+   echo "#------------------------------------------------------------------------------------"
+
+   cd src
+
+   make clean
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_INFO: OpenParEM failed to make clean"
+   fi
+
+   ./configure --prefix="$install_path"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: OpenParEM failed to configure"
+      exit 1
+   fi
+
+   make -j "$jobs"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: OpenParEM failed to make"
+      exit 1
+   fi
+
+   make install
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: OpenParEM failed to install"
+      exit 1
+   fi
+
+   make check
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: OpenParEM failed to check"
+      exit 1
+   fi
+
+   cd ..
+fi
+
+cd scripts
+
+# finish up with elapsed time
+end_time="$(date -u +%s)"
+elapsed=$(( end_time - start_time ))
+echo "OpenParEM_build elapsed time (s): $elapsed"
+
+exit 0

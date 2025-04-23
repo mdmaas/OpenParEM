@@ -1,0 +1,68 @@
+#!/bin/sh
+
+print_help=0
+retVal=0
+operation=""
+search_term=""
+extension="proj"
+
+if [ $# = 0 ]; then
+   print_help=1
+   retVal=1
+fi
+
+if [ $# = 1 ]; then
+   print_help=1
+   if [ "$1" = "-h" -o "$1" = "--help" ]; then
+      retVal=0
+   else
+      retVal=1
+   fi 
+fi
+
+if [ $# = 2 ]; then
+   if [ "$1" != "has" -a "$1" != "hasnot" ]; then
+      print_help=1
+      retVal=1
+   else
+      operation=$1
+      search_term=$2
+   fi
+fi
+
+if [ $# -gt 2 ]; then
+   print_help=1
+   retVal=1
+fi
+
+if [ $print_help = 1 ]; then
+   echo "Usage: proj_search has|hasnot search_term"
+   exit $retVal
+fi
+
+
+recursive_loop() {
+   for item in "$1"/*; do
+      if [ -d "$item" ]; then
+         recursive_loop "$item"
+      elif [ -f "$item" ]; then
+         file_extension=${item##*.}
+         if [ "$file_extension" = "$extension" ]; then
+            if [ "$operation" = "has" ]; then
+               grep --with-filename $search_term $item 
+            fi
+
+            if [ "$operation" = "hasnot" ]; then
+               grep $search_term $item > /dev/null
+               if [ $? = 1 ]; then
+                  echo $item
+               fi
+            fi
+         fi
+      fi
+   done
+}
+
+recursive_loop "."
+
+

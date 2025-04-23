@@ -1,0 +1,69 @@
+#/bin/sh
+
+echo "-------------------------------------------------------------------------------------------------------"
+echo "Testing OpenParEM2D"
+echo "-------------------------------------------------------------------------------------------------------"
+
+# check for executables
+
+count=0
+
+executable_path=$(which OpenParEM2D)
+if [ "$executable_path" != "" ]; then
+   count=$(expr $count + 1)
+else
+   echo "ERROR: Cannot find the executable \"OpenParEM2D\"."
+fi
+
+process_path=$(which process2D)
+if [ "$process_path" != "" ]; then
+   count=$(expr $count + 1)
+else
+   echo "ERROR: Cannot find the executable \"process2D\"."
+fi
+
+script_path=$(which process2D.sh)
+if [ "$script_path" != "" ]; then
+   count=$(expr $count + 1)
+else
+   echo "ERROR: Cannot find the script \"process2D.sh\"."
+fi
+
+script_path=$(which OpenParEM2D_test)
+if [ "$script_path" != "" ]; then
+   count=$(expr $count + 1)
+else
+   echo "ERROR: Cannot find the script \"OpenParEM2D_test\"."
+fi
+
+if [ $count != 4 ]; then
+   exit 1
+fi
+
+# test
+
+cd ../../regression/OpenParEM2D/coax_modal_run_test
+if [ $? -ne 0 ]; then
+   echo "ERROR: Unable to find the test directory \"coax_modal_run_test\"."
+   exit 1
+fi
+
+retval=0
+rm -f .coax.lock
+rm -f .coax_test.lock
+process2D.sh coax.proj 4 > test.log 2>&1
+if [ $? -eq 0 ]; then
+   echo "Test Result: pass"
+else
+   echo "Test Result: FAIL"
+   echo "Check test.log in regression/OpenParEM2D/coax_modal_run_test"
+   retval=1
+fi
+
+cd ../../../scripts
+
+echo "-------------------------------------------------------------------------------------------------------"
+
+exit $retval
+
+

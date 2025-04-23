@@ -1,0 +1,38 @@
+#OpenParEMmaterials 1.0
+
+Material
+   name=teflon
+   Temperature
+      temperature=any
+      Frequency
+         frequency=any
+         er=2.2
+         mur=1
+         tand=0
+         Rz=0
+      EndFrequency
+   EndTemperature
+   Source
+      generic teflon
+   EndSource
+EndMaterial
+
+Material
+   name=F4B
+   Temperature
+      temperature=any
+      Frequency
+         frequency=any
+         er=2.5
+         mur=1
+         tand=0.002
+         Rz=0
+      EndFrequency
+   EndTemperature
+   Source
+      reference paper
+   EndSource
+EndMaterial
+
+
+

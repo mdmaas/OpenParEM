@@ -1,0 +1,168 @@
+----------------------------------------------------------------------------------
+Installing OpenParEM using the package with pre-compiled binaries
+----------------------------------------------------------------------------------
+
+1. Download the installation package OpenParEM_bin_version.tar.gz
+2. Copy the installation package to an installation directory "install_dir"
+3. cd to install_dir and unpack the installation directory using the command line
+   $ tar -xf OpenParEM_bin_version.tar.gz
+4. In directory $HOME, edit the configuration file for the shell used
+   for command line processing.
+
+   example:
+   a. cd $HOME
+   b. check which shell is being used
+      $ echo $SHELL
+      /bin/bash
+   c. for bash, the configuration file is .bashrc
+   d. edit .bashrc with any text editor
+
+5. Add the following paths to the shell configuration file
+
+   install_dir/OpenParEM/bin
+   install_dir/OpenParEM/scripts
+
+   example using the bash shell for install_dir:
+      export PATH=install_dir/OpenParEM/bin:$install_dir/OpenParEM/scripts:$PATH
+
+   example when install_dir is the user's home directory:
+      export PATH=$HOME/OpenParEM/bin:$HOME/OpenParEM/scripts:$PATH
+
+6. Add the following environment variables to the configuration file
+
+   OMP_NUM_THREADS=1
+   OPAL_PREFIX=install_dir/OpenParEM
+   PMIX_PREFIX=install_dir/OpenParEM
+   LD_LIBRARY_PATH=install_dir/OpenParEM/lib
+
+   example using bash when install_dir is the user's home directory:
+      export OMP_NUM_THREADS=1
+      export OPAL_PREFIX=$HOME/OpenParEM
+      export PMIX_PREFIX=$HOME/OpenParEM
+      export LD_LIBRARY_PATH=$HOME/OpenParEM/lib
+
+   If there is an environment variable for PETSC_DIR, delete it.
+   Similarly, delete any setting for PETSC_ARCH.
+
+   example using bash when install_dir is the user's home directory:
+      export OMP_NUM_THREADS=1
+
+7. save the configuration file and exit the text editor
+8. Open a new terminal to pick up the new settings.
+9. Test the installation
+
+   $ cd install_dir/OpenParEM/scripts
+   $ OpenParEM_test
+
+10. If the two tests pass, then the installation is complete.
+
+----------------------------------------------------------------------------------
+Installing OpenParEM using the package with source code and compilation
+----------------------------------------------------------------------------------
+
+Preliminary
+
+The compilation tools make, g++, and gfortran must be installed on the system to
+complete the installation.  The "which" command can be used to determine if a 
+tool is installed.  For example, if the command
+
+   $ which make
+
+returns a path, then make is installed.  If nothing is returned, then it is not
+installed.
+
+Missing tools can be installed using the system's package manager. For example,
+using the Debian package manager APT (used on Debian, Ubuntu, Linux Mint, and
+others), the commands are
+
+   $ sudo apt-get install make
+   $ sudo apt-get install g++
+   $ sudo apt-get install gfortran
+
+Note that installing packages requires system-level installation priviledges.
+
+Installation 
+
+1. Download the installation package OpenParEM_src_version.tar.gz
+2. Copy the installation package to a src directory "src_dir"
+3. cd to src_dir and unpack the src tree using the command line:
+   $ tar -xf OpenParEM_src_version.tar.gz
+4. cd to OpenParEM/scripts
+5. compile and install in the src tree by running the script "OpenParEM_build"
+
+   example:
+      $ ./OpenParEM_build --jobs=4 --with-all
+
+      In this case, the installation directory install_dir=src_dir/OpenParEM and
+      the compilers use 4 processors for faster compilation. All libraries are
+      compiled for maximum compatibility.  Testing of OpenParEM primarily uses
+      the --with-all option.
+
+   example:
+      $ ./OpenParEM_build --jobs=4 
+
+      cmake, flex, bison, and Open MPI are not compiled and installed if they are
+      found on the system.  For Open MPI, the development package must be installed
+      in addition to the executable package.
+
+   Some compiling issues are reported with a message "See 'config.log' for
+   more details".  The config.log file is located in the directory where
+   the error occured, not the directory from which the OpenParEM_build is run.
+   To find the config.log file, execute
+
+      $ find .. -name "config.log" -print
+
+6. OpenParEM can be in installed in a different location "install_dir"
+   by providing the location to the build script with the --prefix option
+
+   example installing in the directory $HOME/local:
+      $ ./OpenParEM_build --jobs=4 --prefix=$HOME/local --with-all
+
+      In this case, install_dir=$HOME/local
+
+7. When compilation completes, OpenParEM2D and OpenParEM3D are tested. If
+   the two tests pass, then the basic installation is complete and just
+   paths and an environment variable need to be set.
+
+8. In directory $HOME, edit the configuration file for the shell used
+   for command line processing.
+
+   example:
+   a. cd $HOME
+   b. check which shell is being used
+      $ echo $SHELL
+        /bin/bash
+   c. for bash, the configuration file is .bashrc
+   d. edit .bashrc with any text editor
+
+9. Add the following paths to the shell configuration file:
+
+   install_dir/bin
+   install_dir/scripts
+
+   example using the bash shell for install_dir:
+      export PATH=install_dir/bin:$install_dir/scripts:$PATH
+
+   example when install_dir is $HOME/local
+      export PATH=$HOME/local/bin:$HOME/local/scripts:$PATH
+
+10. Add the following environment variable to the configuration file:
+
+   OMP_NUM_THREADS=1
+
+   example for .bashrc:
+      export OMP_NUM_THREADS=1
+
+   If there is an environment variable for PETSC_DIR, delete it.
+   Similarly, delete any setting for PETSC_ARCH.
+
+11. Save the configuration file and exit the text editor.
+12. Open a new terminal to pick up the new settings.
+13. Test the installation with these commands:
+
+   $ cd src_dir/OpenParEM/scripts
+   $ OpenParEM_test
+
+14. If the two tests pass, then the installation is complete.
+
+

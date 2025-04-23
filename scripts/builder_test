@@ -1,0 +1,25 @@
+#!/bin/sh
+
+builder builder.txt
+diff $1.geo $1.geo.golden > junk
+diff $1.proj $1.proj.golden >> junk
+
+if [ -f $1_modes.txt.golden ]; then
+   diff $1_modes.txt $1_modes.txt.golden >> junk
+fi
+
+if [ -f $1_lines.txt.golden ]; then
+   diff $1_lines.txt $1_lines.txt.golden >> junk
+fi
+
+
+size="$(wc -c < junk)"
+
+if [ $size = 0 ]; then
+   echo "$1: pass"
+else
+   echo "$1: FAIL"
+fi 
+
+rm junk
+

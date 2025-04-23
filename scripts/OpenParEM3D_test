@@ -1,0 +1,76 @@
+#/bin/sh
+
+echo "-------------------------------------------------------------------------------------------------------"
+echo "Testing OpenParEM3D"
+echo "-------------------------------------------------------------------------------------------------------"
+
+# check for executables
+
+count=0
+
+OpenParEM2D_path=$(which OpenParEM2D)
+if [ "$OpenParEM2D_path" != "" ]; then
+   count=$(expr $count + 1)
+else
+   echo "ERROR: Cannot find the executable \"OpenParEM2D\"."
+fi
+
+OpenParEM3D_path=$(which OpenParEM3D)
+if [ "$OpenParEM3D_path" != "" ]; then
+   count=$(expr $count + 1)
+else
+   echo "ERROR: Cannot find the executable \"OpenParEM3D\"."
+fi
+
+process_path=$(which process3D)
+if [ "$process_path" != "" ]; then
+   count=$(expr $count + 1)
+else
+   echo "ERROR: Cannot find the executable \"process3D\"."
+fi
+
+script_path=$(which process3D.sh)
+if [ "$script_path" != "" ]; then
+   count=$(expr $count + 1)
+else
+   echo "ERROR: Cannot find the script \"process3D.sh\"."
+fi
+
+script_path=$(which OpenParEM3D_test)
+if [ "$script_path" != "" ]; then
+   count=$(expr $count + 1)
+else
+   echo "ERROR: Cannot find the script \"OpenParEM3D_test\"."
+fi
+
+
+if [ $count != 5 ]; then
+   exit 1
+fi
+
+# test
+
+cd ../../regression/OpenParEM3D/WR90/straight_run_test
+if [ $? -ne 0 ]; then
+   echo "ERROR: Unable to find the test directory \"straight_run_test\"."
+   exit 1
+fi
+
+retval=0
+rm -f .straight.lock
+process3D.sh straight.proj 4 > test.log 2>&1
+if [ $? -eq 0 ]; then
+   echo "Test Result: pass"
+else
+   echo "Test Result: FAIL"
+   echo "Check test.log in regression/OpenParEM3D/WR90/straight_run_test"
+   retval=1
+fi
+
+cd ../../../../scripts
+
+echo "-------------------------------------------------------------------------------------------------------"
+
+exit $retval
+
+
