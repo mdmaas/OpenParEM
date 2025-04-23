@@ -7506,8 +7506,6 @@ else $as_nop
   as_fn_error $? "cannot link to libptscotcherrexit; check config.log" "$LINENO" 5
 fi
 
-# ToDo: get this check working.
-#AC_CHECK_LIB([ptscotchparmetisv3], [SCOTCH_ParMETIS_V3_PartKway], ,AC_MSG_ERROR([cannot link to libptscotchparmetisv3; check config.log]))
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for printFactorMtx in -lpord" >&5
 printf %s "checking for printFactorMtx in -lpord... " >&6; }
 if test ${ac_cv_lib_pord_printFactorMtx+y}
