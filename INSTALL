@@ -138,13 +138,13 @@ Installation
 9. Add the following paths to the shell configuration file:
 
    install_dir/bin
-   install_dir/scripts
+   src_dir/OpenParEM/scripts
 
-   example using the bash shell for install_dir:
-      export PATH=install_dir/bin:$install_dir/scripts:$PATH
+   example using the bash shell for an in-place installation with src_dir=$HOME
+      export PATH=$HOME/OpenParEM/bin:$HOME/OpenParEM/scripts:$PATH
 
-   example when install_dir is $HOME/local
-      export PATH=$HOME/local/bin:$HOME/local/scripts:$PATH
+   example when src_dir=$HOME and install_dir=$HOME/local 
+      export PATH=$HOME/local/bin:$HOME/OpenParEM/scripts:$PATH
 
 10. Add the following environment variable to the configuration file:
 

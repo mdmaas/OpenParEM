@@ -72,8 +72,6 @@ AC_CHECK_LIB([scotch], [scotchfstratinit_], ,AC_MSG_ERROR([cannot link to libsco
 AC_CHECK_LIB([ptscotcherr], [SCOTCH_errorPrint], ,AC_MSG_ERROR([cannot link to libptscotcherr; check config.log]))
 AC_CHECK_LIB([ptscotch], [scotchfdgraphorderinit_], ,AC_MSG_ERROR([cannot link to libptscotch; check config.log]))
 AC_CHECK_LIB([ptscotcherrexit], [SCOTCH_errorPrint], ,AC_MSG_ERROR([cannot link to libptscotcherrexit; check config.log]))
-# ToDo: get this check working.
-#AC_CHECK_LIB([ptscotchparmetisv3], [SCOTCH_ParMETIS_V3_PartKway], ,AC_MSG_ERROR([cannot link to libptscotchparmetisv3; check config.log]))
 AC_CHECK_LIB([pord], [printFactorMtx], ,AC_MSG_ERROR([cannot link to libpord; check config.log]))
 AC_CHECK_LIB([esmumps], [esmumps], ,AC_MSG_ERROR([cannot link to libesmumps; check config.log]))
 AC_CHECK_LIB([ptesmumps], [esmumpsv], ,AC_MSG_ERROR([cannot link to libptesmumps; check config.log]))
