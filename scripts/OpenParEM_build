@@ -673,67 +673,67 @@ cd "$scripts_dir"
 
 missing_sources=0
 
-if [ "$with_bison" = "1" -a ! -f "$external_packages/$bison" ]; then
+if [ "$with_bison" = "1" -a ! -f "../external_packages/$bison" ]; then
    missing_sources=1
-   echo "OpenParEM_ERROR: bison compile requested but the file $external_packages/$bison is missing."
+   echo "OpenParEM_ERROR: bison compile requested but the file ../external_packages/$bison is missing."
 fi
 
-if [ "$with_zlib" = "1" -a ! -f "$external_packages/$zlib" ]; then
+if [ "$with_zlib" = "1" -a ! -f "../external_packages/$zlib" ]; then
    missing_sources=1
-   echo "OpenParEM_ERROR: zlib compile requested but the file $external_packages/$zlib is missing."
+   echo "OpenParEM_ERROR: zlib compile requested but the file ../external_packages/$zlib is missing."
 fi
 
-if [ "$with_flex" = "1" -a ! -f "$external_packages/$flex" ]; then
+if [ "$with_flex" = "1" -a ! -f "../external_packages/$flex" ]; then
    missing_sources=1
-   echo "OpenParEM_ERROR: flex compile requested but the file $external_packages/$flex is missing."
+   echo "OpenParEM_ERROR: flex compile requested but the file ../external_packages/$flex is missing."
 fi
 
-if [ "$with_hwloc" = "1" -a ! -f "$external_packages/$hwloc" ]; then
+if [ "$with_hwloc" = "1" -a ! -f "../external_packages/$hwloc" ]; then
    missing_sources=1
-   echo "OpenParEM_ERROR: hwloc compile requested but the file $external_packages/$hwloc is missing."
+   echo "OpenParEM_ERROR: hwloc compile requested but the file ../external_packages/$hwloc is missing."
 fi
 
-if [ "$with_libevent" = "1" -a ! -f "$external_packages/$libevent" ]; then
+if [ "$with_libevent" = "1" -a ! -f "../external_packages/$libevent" ]; then
    missing_sources=1
-   echo "OpenParEM_ERROR: libevent compile requested but the file $external_packages/$libevent is missing."
+   echo "OpenParEM_ERROR: libevent compile requested but the file ../external_packages/$libevent is missing."
 fi
 
-if [ "$with_pmix" = "1" -a ! -f "$external_packages/$pmix" ]; then
+if [ "$with_pmix" = "1" -a ! -f "../external_packages/$pmix" ]; then
    missing_sources=1
-   echo "OpenParEM_ERROR: pmix compile requested but the file $external_packages/$pmix is missing."
+   echo "OpenParEM_ERROR: pmix compile requested but the file ../external_packages/$pmix is missing."
 fi
 
-if [ "$with_prrte" = "1" -a ! -f "$external_packages/$prrte" ]; then
+if [ "$with_prrte" = "1" -a ! -f "../external_packages/$prrte" ]; then
    missing_sources=1
-   echo "OpenParEM_ERROR: prrte compile requested but the file $external_packages/$prrte is missing."
+   echo "OpenParEM_ERROR: prrte compile requested but the file ../external_packages/$prrte is missing."
 fi
 
-if [ "$with_openmpi" = "1" -a ! -f "$external_packages/$openmpi" ]; then
+if [ "$with_openmpi" = "1" -a ! -f "../external_packages/$openmpi" ]; then
    missing_sources=1
-   echo "OpenParEM_ERROR: openmpi compile requested but the file $external_packages/$openmpi is missing."
+   echo "OpenParEM_ERROR: openmpi compile requested but the file ../external_packages/$openmpi is missing."
 fi
 
-if [ "$with_hypre" = "1" -a ! -f "$external_packages/$hypre" ]; then
+if [ "$with_hypre" = "1" -a ! -f "../external_packages/$hypre" ]; then
    missing_sources=1
-   echo "OpenParEM_ERROR: hypre compile requested but the file $external_packages/$hypre is missing."
+   echo "OpenParEM_ERROR: hypre compile requested but the file ../external_packages/$hypre is missing."
 fi
 
-if [ "$with_petsc" = "1" -a ! -f "$external_packages/$petsc" ]; then
+if [ "$with_petsc" = "1" -a ! -f "../external_packages/$petsc" ]; then
    missing_sources=1
-   echo "OpenParEM_ERROR: petsc compile requested but the file $external_packages/$petsc is missing."
+   echo "OpenParEM_ERROR: petsc compile requested but the file ../external_packages/$petsc is missing."
 fi
 
-if [ "$with_mfem" = "1" -a ! -f "$external_packages/$mfem" ]; then
+if [ "$with_mfem" = "1" -a ! -f "../external_packages/$mfem" ]; then
    missing_sources=1
-   echo "OpenParEM_ERROR: mfem compile requested but the file $external_packages/$mfem is missing."
+   echo "OpenParEM_ERROR: mfem compile requested but the file ../external_packages/$mfem is missing."
 fi
 
-if [ "$with_OpenParEM" = "1" -a ! -f "src"]; then
+if [ "$with_OpenParEM" = "1" -a ! -d "../src" ]; then
    missing_sources=1
-   echo "OpenParEM_ERROR: mfem compile requested but the src directory is missing."
+   echo "OpenParEM_ERROR: mfem compile requested but the ../src directory is missing."
 fi
 
-if [ $missing_sources" = "1" ]; then
+if [ "$missing_sources" = "1" ]; then
    exit 1
 fi
 
