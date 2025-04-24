@@ -46,15 +46,19 @@ Installing OpenParEM using the package with pre-compiled binaries
 
    example using bash when install_dir is the user's home directory:
       export OMP_NUM_THREADS=1
+7. Copy the FreeCAD and ParaView Python scripts to the default locations
 
-7. save the configuration file and exit the text editor
-8. Open a new terminal to pick up the new settings.
-9. Test the installation
+   $ cd install_dir/OpenParEM/scripts
+   $ OpenParEM_build --without-all
+
+8. save the configuration file and exit the text editor
+9. Open a new terminal to pick up the new settings.
+10. Test the installation
 
    $ cd install_dir/OpenParEM/scripts
    $ OpenParEM_test
 
-10. If the two tests pass, then the installation is complete.
+11. If the two tests pass, then the installation is complete.
 
 ----------------------------------------------------------------------------------
 Installing OpenParEM using the package with source code and compilation
