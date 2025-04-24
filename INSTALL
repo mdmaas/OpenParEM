@@ -87,10 +87,10 @@ Note that installing packages requires system-level installation priviledges.
 
 Installation 
 
-1. Download the installation package OpenParEM_src_version.tar.gz
+1. Download the installation package OpenParEM_version.tar.gz
 2. Copy the installation package to a src directory "src_dir"
 3. cd to src_dir and unpack the src tree using the command line:
-   $ tar -xf OpenParEM_src_version.tar.gz
+   $ tar -xf OpenParEM_version.tar.gz
 4. cd to OpenParEM/scripts
 5. compile and install in the src tree by running the script "OpenParEM_build"
 
