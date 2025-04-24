@@ -87,17 +87,17 @@ Note that installing packages requires system-level installation priviledges.
 
 Installation 
 
-1. Download the installation package OpenParEM_version.tar.gz
+1. Download the installation package OpenParEM-version.tar.gz
 2. Copy the installation package to a src directory "src_dir"
 3. cd to src_dir and unpack the src tree using the command line:
-   $ tar -xf OpenParEM_version.tar.gz
-4. cd to OpenParEM/scripts
+   $ tar -xf OpenParEM-version.tar.gz
+4. cd to OpenParEM-version/scripts
 5. compile and install in the src tree by running the script "OpenParEM_build"
 
    example:
       $ ./OpenParEM_build --jobs=4 --with-all
 
-      In this case, the installation directory install_dir=src_dir/OpenParEM and
+      The installation directory install_dir=src_dir/OpenParEM-version and
       the compilers use 4 processors for faster compilation. All libraries are
       compiled for maximum compatibility.  Testing of OpenParEM primarily uses
       the --with-all option.
@@ -142,13 +142,13 @@ Installation
 9. Add the following paths to the shell configuration file:
 
    install_dir/bin
-   src_dir/OpenParEM/scripts
+   src_dir/OpenParEM-version/scripts
 
    example using the bash shell for an in-place installation with src_dir=$HOME
-      export PATH=$HOME/OpenParEM/bin:$HOME/OpenParEM/scripts:$PATH
+      export PATH=$HOME/OpenParEM-version/bin:$HOME/OpenParEM-version/scripts:$PATH
 
    example when src_dir=$HOME and install_dir=$HOME/local 
-      export PATH=$HOME/local/bin:$HOME/OpenParEM/scripts:$PATH
+      export PATH=$HOME/local/bin:$HOME/OpenParEM-version/scripts:$PATH
 
 10. Add the following environment variable to the configuration file:
 
@@ -157,14 +157,14 @@ Installation
    example for .bashrc:
       export OMP_NUM_THREADS=1
 
-   If there is an environment variable for PETSC_DIR, delete it.
-   Similarly, delete any setting for PETSC_ARCH.
+   Delete any settings for OPAL_PREFIX, PMIX_PREFIX, LD_LIBRARY_PATH,
+   PETSC_DIR, and PETSC_ARCH.
 
 11. Save the configuration file and exit the text editor.
 12. Open a new terminal to pick up the new settings.
 13. Test the installation with these commands:
 
-   $ cd src_dir/OpenParEM/scripts
+   $ cd src_dir/OpenParEM-version/scripts
    $ OpenParEM_test
 
 14. If the two tests pass, then the installation is complete.

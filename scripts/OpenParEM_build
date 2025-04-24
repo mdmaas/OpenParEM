@@ -516,84 +516,87 @@ echo "PATH=$PATH"
 echo "OMP_NUM_THREADS=$OMP_NUM_THREADS"
 echo "jobs=$jobs"
 
-if [ "$with_bison" = "1" ]; then
-   echo "with-bison=$with_bison using $bison"
-else
-   echo "with-bison=$with_bison"
-fi
+if [ "$without-all" = "0" ]; then
 
-if [ "$with_zlib" = "1" ]; then
-   echo "with-zlib=$with_zlib using $zlib"
-else
-   echo "with-zlib=$with_zlib"
-fi
-
-if [ "$with_flex" = "1" ]; then
-   echo "with-flex=$with_flex using $flex"
-else
-   echo "with-flex=$with_flex"
-fi
-
-if [ "$with_hwloc" = "1" ]; then
-   echo "with-hwloc=$with_hwloc using $hwloc"
-else
-   echo "with-hwloc=$with_hwloc"
-fi
-
-if [ "$with_libevent" = "1" ]; then
-   echo "with-libevent=$with_libevent using $libevent"
-else
-   echo "with-libevent=$with_libevent"
-fi
-
-if [ "$with_pmix" = "1" ]; then
-   echo "with-pmix=$with_pmix using $pmix"
-else
-   echo "with-pmix=$with_pmix"
-fi
-
-if [ "$with_prrte" = "1" ]; then
-   echo "with-prrte=$with_prrte using $prrte"
-else
-   echo "with-prrte=$with_prrte"
-fi
-
-if [ "$with_openmpi" = "1" ]; then
-   echo "with-openmpi=$with_openmpi using $openmpi"
-else
-   echo "with-openmpi=$with_openmpi"
-fi
-
-if [ "$with_hypre" = "1" ]; then
-   echo "with-hypre=$with_hypre using $hypre"
-else
-   echo "with-hypre=$with_hypre"
-fi
-
-if [ "$with_petsc" = "1" ]; then
-   echo "with-petsc=$with_petsc using $petsc"
-   echo "   including:"
-   echo "      fblaslapack=$fblaslapack"
-   echo "      mumps=$mumps"
-   echo "      scalapack=$scalapack"
-   echo "      scotch=$scotch"
-
-   if [ "$with_cmake" = "1" ]; then
-      echo "   with-cmake=$with_cmake using $cmake"
+   if [ "$with_bison" = "1" ]; then
+      echo "with-bison=$with_bison using $bison"
    else
-      echo "   with-cmake=$with_cmake"
+      echo "with-bison=$with_bison"
    fi
-else
-   echo "with-petsc=$with_petsc"
-fi
 
-if [ "$with_mfem" = "1" ]; then
-   echo "with-mfem=$with_mfem using $mfem"
-else
-   echo "with-mfem=$with_mfem"
-fi
+   if [ "$with_zlib" = "1" ]; then
+      echo "with-zlib=$with_zlib using $zlib"
+   else
+      echo "with-zlib=$with_zlib"
+   fi
 
-echo "with-OpenParEM=$with_OpenParEM"
+   if [ "$with_flex" = "1" ]; then
+      echo "with-flex=$with_flex using $flex"
+   else
+      echo "with-flex=$with_flex"
+   fi
+
+   if [ "$with_hwloc" = "1" ]; then
+      echo "with-hwloc=$with_hwloc using $hwloc"
+   else
+      echo "with-hwloc=$with_hwloc"
+   fi
+
+   if [ "$with_libevent" = "1" ]; then
+      echo "with-libevent=$with_libevent using $libevent"
+   else
+      echo "with-libevent=$with_libevent"
+   fi
+
+   if [ "$with_pmix" = "1" ]; then
+      echo "with-pmix=$with_pmix using $pmix"
+   else
+      echo "with-pmix=$with_pmix"
+   fi
+
+   if [ "$with_prrte" = "1" ]; then
+      echo "with-prrte=$with_prrte using $prrte"
+   else
+      echo "with-prrte=$with_prrte"
+   fi
+
+   if [ "$with_openmpi" = "1" ]; then
+      echo "with-openmpi=$with_openmpi using $openmpi"
+   else
+      echo "with-openmpi=$with_openmpi"
+   fi
+
+   if [ "$with_hypre" = "1" ]; then
+      echo "with-hypre=$with_hypre using $hypre"
+   else
+      echo "with-hypre=$with_hypre"
+   fi
+
+   if [ "$with_petsc" = "1" ]; then
+      echo "with-petsc=$with_petsc using $petsc"
+      echo "   including:"
+      echo "      fblaslapack=$fblaslapack"
+      echo "      mumps=$mumps"
+      echo "      scalapack=$scalapack"
+      echo "      scotch=$scotch"
+
+      if [ "$with_cmake" = "1" ]; then
+         echo "   with-cmake=$with_cmake using $cmake"
+      else
+         echo "   with-cmake=$with_cmake"
+      fi
+   else
+      echo "with-petsc=$with_petsc"
+   fi
+
+   if [ "$with_mfem" = "1" ]; then
+      echo "with-mfem=$with_mfem using $mfem"
+   else
+      echo "with-mfem=$with_mfem"
+   fi
+
+   echo "with-OpenParEM=$with_OpenParEM"
+fi
 
 if [ "$show_setup" = "1" ]; then
    exit 0
@@ -602,6 +605,10 @@ fi
 #----------------------------------------------------
 # copy Python scripts for FreeCAD and ParaView
 #----------------------------------------------------
+
+echo "#------------------------------------------------------------------------------------"
+echo "# OpenParEM_build: copying FreeCAD and ParaView scripts"
+echo "#------------------------------------------------------------------------------------"
 
 # FreeCAD
 
@@ -630,7 +637,12 @@ if [ $? -ne 0 ]; then
    exit 1
 fi
 
-cp * "$HOME/.FreeCAD/Macro"
+
+echo "copy FreeCAD/OpenParEM2D_save.py to $HOME/.FreeCAD/Macro"
+cp OpenParEM2D_save.py "$HOME/.FreeCAD/Macro"
+
+echo "copy FreeCAD/OpenParEM3D_save.py to $HOME/.FreeCAD/Macro"
+cp OpenParEM3D_save.py "$HOME/.FreeCAD/Macro"
 
 # ParaView
 
@@ -669,7 +681,8 @@ if [ $? -ne 0 ]; then
    exit 1
 fi
 
-cp * "$HOME/.config/ParaView/Macros"
+echo "copy ParaView/field_plot.py to $HOME/.config/ParaView/Macros"
+cp field_plot.py "$HOME/.config/ParaView/Macros"
 
 cd "$scripts_dir"
 

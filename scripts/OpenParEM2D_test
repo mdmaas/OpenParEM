@@ -56,7 +56,7 @@ if [ $? -eq 0 ]; then
    echo "Test Result: pass"
 else
    echo "Test Result: FAIL"
-   echo "Check test.log in regression/OpenParEM2D/coax_modal_run_test"
+   echo "Check the log file ../regression/OpenParEM2D/coax_modal_run_test/test.log"
    retval=1
 fi
 
