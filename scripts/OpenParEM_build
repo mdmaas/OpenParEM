@@ -47,20 +47,19 @@ cmake="https://github.com/Kitware/CMake/releases/download/v3.31.6/cmake-3.31.6.t
 # packages to install
 #----------------------------------------------------
 
-with_bison=0
-with_zlib=0
-with_flex=0
-with_hwloc=0
-with_libevent=0
-with_pmix=0
-with_prrte=0
-with_openmpi=0
+with_bison=1
+with_zlib=1
+with_flex=1
+with_hwloc=1
+with_libevent=1
+with_pmix=1
+with_prrte=1
+with_openmpi=1
 with_hypre=1
-with_cmake=0
+with_cmake=1
 with_petsc=1
 with_mfem=1
 with_OpenParEM=1
-with_all=0
 
 #----------------------------------------------------
 # library types
@@ -104,32 +103,37 @@ if [ $? -ne 0 ]; then
    missing_requirement=1
 fi
 
+which perl > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+   echo "ERROR: \"perl\" must be installed on the system to compile OpenParEM"
+   missing_requirement=1
+fi
+
 if [ "$missing_requirement" = "1" ]; then
    exit 1
 fi
 
-has_cmake=0 
 which cmake > /dev/null 2>&1
 if [ $? -eq 0 ]; then
-   has_cmake=1
+   with_cmake=0
 fi
 
-has_bison=0
 which bison > /dev/null 2>&1
 if [ $? -eq 0 ]; then
-   has_bison=1
+   with_bison=0
 fi
 
-has_flex=0
 which flex > /dev/null 2>&1
 if [ $? -eq 0 ]; then
-   has_flex=1
+   with_flex=0
 fi
 
-has_mpi=0
 which mpirun > /dev/null 2>&1
 if [ $? -eq 0 ]; then
-   has_mpi=1
+   with_hwloc=0
+   with_libevent=0
+   with_pmix=0
+   with_openmpi=0
 fi
 
 #----------------------------------------------------
@@ -285,7 +289,19 @@ for arg in "$@"; do
          with_mfem=0
          with_OpenParEM=0
       elif [ "$arg" = "--with-all" ]; then
-         with_all=1
+         with_bison=1
+         with_zlib=1
+         with_flex=1
+         with_hwloc=1
+         with_libevent=1
+         with_pmix=1
+         with_prrte=1
+         with_openmpi=1
+         with_hypre=1
+         with_cmake=1
+         with_petsc=1
+         with_mfem=1
+         with_OpenParEM=1
       elif [ "$arg" = "--show-setup" ]; then
          show_setup=1
       elif [ "$arg" = "--clean-in-place" ]; then
@@ -459,48 +475,6 @@ echo "#-------------------------------------------------------------------------
 echo "# OpenParEM_build: setup"
 echo "#------------------------------------------------------------------------------------"
 
-if [ "$has_cmake" = "0" ]; then
-   with_cmake=1
-fi
-
-if [ "$has_bison" = "0" -o "$with_bison" = "1" ]; then
-   with_bison=1
-fi
-
-if [ "$has_flex" = "0" -o "$with_flex" = "1" ]; then
-   with_bison=1
-   with_zlib=1
-   with_flex=1
-fi
-
-if [ "$with_hypre" = "1" ]; then
-   with_zlib=1
-fi
-
-if [ "$has_mpi" = "0" -o "$with_openmpi" = "1" ]; then
-   with_hwloc=1
-   with_libevent=1
-   with_pmix=1
-   with_prrte=1
-   with_openmpi=1
-fi
-
-if [ "$with_all" = "1" ]; then
-   with_bison=1
-   with_zlib=1
-   with_flex=1
-   with_hwloc=1
-   with_libevent=1
-   with_pmix=1
-   with_prrte=1
-   with_openmpi=1
-   with_hypre=1
-   with_cmake=1
-   with_petsc=1
-   with_mfem=1
-   with_OpenParEM=1
-fi
-
 export PATH="$install_path/bin:$scripts_dir:$PATH"
 export OMP_NUM_THREADS=1
 
@@ -636,7 +610,6 @@ if [ $? -ne 0 ]; then
    echo "OpenParEM_ERROR: failed to cd to $scripts_dir/FreeCAD"
    exit 1
 fi
-
 
 echo "copy FreeCAD/OpenParEM2D_save.py to $HOME/.FreeCAD/Macro"
 cp OpenParEM2D_save.py "$HOME/.FreeCAD/Macro"
