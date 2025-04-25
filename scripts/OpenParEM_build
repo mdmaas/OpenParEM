@@ -8,6 +8,7 @@
 # having to install them with root priviledges, they are compiled here.
 
 # www.gnu.org
+m4="m4-1.4.19.tar.gz"
 bison="bison-3.8.tar.gz"
 zlib="zlib-1.3.1.tar.gz"
 flex="flex-2.6.4.tar.gz"
@@ -47,6 +48,7 @@ cmake="https://github.com/Kitware/CMake/releases/download/v3.31.6/cmake-3.31.6.t
 # packages to install
 #----------------------------------------------------
 
+with_m4=1
 with_bison=1
 with_zlib=1
 with_flex=1
@@ -125,6 +127,7 @@ fi
 
 which flex > /dev/null 2>&1
 if [ $? -eq 0 ]; then
+   with_m4=0
    with_flex=0
 fi
 
@@ -275,6 +278,7 @@ for arg in "$@"; do
 #         enable_static=yes
 #         enable_shared=no
       elif [ "$arg" = "--without-all" ]; then
+         with_m4=0
          with_bison=0
          with_zlib=0
          with_flex=0
@@ -289,6 +293,7 @@ for arg in "$@"; do
          with_mfem=0
          with_OpenParEM=0
       elif [ "$arg" = "--with-all" ]; then
+         with_m4=1
          with_bison=1
          with_zlib=1
          with_flex=1
@@ -306,6 +311,13 @@ for arg in "$@"; do
          show_setup=1
       elif [ "$arg" = "--clean-in-place" ]; then
          clean_in_place=1
+      elif [ "$arg" = "--with-m4" ]; then
+         with_m4=1
+      elif [ "$keyword" = "--with-m4" ]; then
+         with_m4=1
+         m4=$value
+      elif [ "$arg" = "--without-m4" ]; then
+         with_m4=0
       elif [ "$arg" = "--with-bison" ]; then
          with_bison=1
       elif [ "$keyword" = "--with-bison" ]; then
@@ -409,7 +421,7 @@ if [ $print_help -eq 1 ]; then
    echo "Usage: OpenParEM_build [OPTIONS]"
    echo "Builds the OpenParEM distribution when run from the scripts directory."
    echo ""
-   echo "The build tools make, g++, and gfortran must be installed on the system."
+   echo "The build tools make, g++, gfortran, and perl must be installed on the system."
    echo ""
    echo "For an in-place build with the results placed in the distribution tree, execute as"
    echo "   shell: OpenParEM_build --jobs=N --with-all"
@@ -442,6 +454,8 @@ if [ $print_help -eq 1 ]; then
    echo ""
    echo "advanced OPTIONS:"
    echo "  --without-all            skip compiling all; generally followed by --with-* options to add back in something to compile"
+   echo "  --with-m4[=file]         compile m4 using the default distribution or the provided file"
+   echo "  --without-m4             skip compiling m4"
    echo "  --with-bison[=file]      compile bison using the default distribution or the provided file"
    echo "  --without-bison          skip compiling bison"
    echo "  --with-zlib[=file]       compile libzlib using the default distribution or the provided file"
@@ -490,7 +504,13 @@ echo "PATH=$PATH"
 echo "OMP_NUM_THREADS=$OMP_NUM_THREADS"
 echo "jobs=$jobs"
 
-if [ "$without-all" = "0" ]; then
+# show the setup
+
+   if [ "$with_m4" = "1" ]; then
+      echo "with-m4=$with_m4 using $m4"
+   else
+      echo "with-m4=$with_m4"
+   fi
 
    if [ "$with_bison" = "1" ]; then
       echo "with-bison=$with_bison using $bison"
@@ -570,7 +590,6 @@ if [ "$without-all" = "0" ]; then
    fi
 
    echo "with-OpenParEM=$with_OpenParEM"
-fi
 
 if [ "$show_setup" = "1" ]; then
    exit 0
@@ -665,6 +684,11 @@ cd "$scripts_dir"
 
 missing_sources=0
 
+if [ "$with_m4" = "1" -a ! -f "../external_packages/$m4" ]; then
+   missing_sources=1
+   echo "OpenParEM_ERROR: m4 compile requested but the file ../external_packages/$m4 is missing."
+fi
+
 if [ "$with_bison" = "1" -a ! -f "../external_packages/$bison" ]; then
    missing_sources=1
    echo "OpenParEM_ERROR: bison compile requested but the file ../external_packages/$bison is missing."
@@ -737,6 +761,40 @@ cd ..
 
 if [ "$clean_in_place" = "1" ]; then
    rm -Rf bin etc include lib man sbin share
+fi
+
+# m4
+if [ "$with_m4" = "1" ]; then
+
+   echo "#------------------------------------------------------------------------------------"
+   echo "# OpenParEM_build: m4"
+   echo "#------------------------------------------------------------------------------------"
+
+   cd external_packages
+
+   unpack_and_enter "$m4"
+
+   ./configure --prefix="$install_path"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: m4 failed to configure"
+      exit 1
+   fi
+
+   make -j "$jobs"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: m4 failed to make"
+      exit 1
+   fi
+
+   make install
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: ERROR: m4 failed to install"
+      exit 1
+   fi
+
+   cd ..
+   remove_base_directory
+   cd ..
 fi
 
 # bison

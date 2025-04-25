@@ -66,7 +66,7 @@ Installing OpenParEM using the package with source code and compilation
 
 Preliminary
 
-The compilation tools make, g++, and gfortran must be installed on the system to
+The compilation tools make, g++, gfortran, and perl must be installed on the system to
 complete the installation.  The "which" command can be used to determine if a 
 tool is installed.  For example, if the command
 
@@ -82,6 +82,14 @@ others), the commands are
    $ sudo apt-get install make
    $ sudo apt-get install g++
    $ sudo apt-get install gfortran
+   $ sudo apt-get install perl
+
+For Redhat Linux RHEL, the yum package manager is used, with the commands
+
+   $ sudo yum install make
+   $ sudo yum install g++
+   $ sudo yum install gfortran
+   $ sudo yum install perl
 
 Note that installing packages requires system-level installation priviledges.
 
