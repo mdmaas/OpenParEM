@@ -85,36 +85,6 @@ fi
 # check for installed tools
 #----------------------------------------------------
 
-missing_requirement=0
-
-which make > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-   echo "ERROR: \"make\" must be installed on the system to compile OpenParEM"
-   missing_requirement=1
-fi
-
-which g++ > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-   echo "ERROR: \"g++\" must be installed on the system to compile OpenParEM"
-   missing_requirement=1
-fi
-
-which gfortran > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-   echo "ERROR: \"gfortran\" must be installed on the system to compile OpenParEM"
-   missing_requirement=1
-fi
-
-which perl > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-   echo "ERROR: \"perl\" must be installed on the system to compile OpenParEM"
-   missing_requirement=1
-fi
-
-if [ "$missing_requirement" = "1" ]; then
-   exit 1
-fi
-
 which cmake > /dev/null 2>&1
 if [ $? -eq 0 ]; then
    with_cmake=0
@@ -750,6 +720,99 @@ if [ "$with_OpenParEM" = "1" -a ! -d "../src" ]; then
 fi
 
 if [ "$missing_sources" = "1" ]; then
+   exit 1
+fi
+
+#----------------------------------------------------
+# check for installed build tools
+#----------------------------------------------------
+
+has_build=0
+
+if [ "$with_m4" = "1" ]; then
+   has_build=1
+fi
+
+if [ "$with_bison" = "1" ]; then
+   has_build=1
+fi
+
+if [ "$with_zlib" = "1" ]; then
+   has_build=1
+fi
+
+if [ "$with_flex" = "1" ]; then
+   has_build=1
+fi
+
+if [ "$with_hwloc" = "1" ]; then
+   has_build=1
+fi
+
+if [ "$with_libevent" = "1" ]; then
+   has_build=1
+fi
+
+if [ "$with_pmix" = "1" ]; then
+   has_build=1
+fi
+
+if [ "$with_prrte" = "1" ]; then
+   has_build=1
+fi
+
+if [ "$with_openmpi" = "1" ]; then
+   has_build=1
+fi
+
+if [ "$with_hypre" = "1" ]; then
+   has_build=1
+fi
+
+if [ "$with_petsc" = "1" ]; then
+   has_build=1
+fi
+
+if [ "$with_mfem" = "1" ]; then
+   has_build=1
+fi
+
+if [ "$with_OpenParEM" = "1" ]; then
+   has_build=1
+fi
+
+if [ "$has_build" = "0" ]; then
+   exit 0
+fi
+
+
+missing_requirement=0
+
+which make > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+   echo "ERROR: \"make\" must be installed on the system to compile OpenParEM"
+   missing_requirement=1
+fi
+
+which g++ > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+   echo "ERROR: \"g++\" must be installed on the system to compile OpenParEM"
+   missing_requirement=1
+fi
+
+which gfortran > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+   echo "ERROR: \"gfortran\" must be installed on the system to compile OpenParEM"
+   missing_requirement=1
+fi
+
+which perl > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+   echo "ERROR: \"perl\" must be installed on the system to compile OpenParEM"
+   missing_requirement=1
+fi
+
+if [ "$missing_requirement" = "1" ]; then
    exit 1
 fi
 
