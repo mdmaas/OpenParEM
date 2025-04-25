@@ -64,18 +64,31 @@ Installing OpenParEM using the package with pre-compiled binaries
 Installing OpenParEM using the package with source code and compilation
 ----------------------------------------------------------------------------------
 
-Preliminary
+Compilation is verified for the following operating systems:
+
+Ubuntu 22.04.5 LTS
+Ubuntu 24.04.2 LTS
+Redhat RHEL 9.5
+Debian 12
+
+Compililation fails for the following operating systems:
+
+Suse SLES 15-SP6 - fails during compilation of the MFEM library with a segmentation fault by reported by mpicxx
+Suse SLES 12-SP5 - fails during configuration of Petsc for fortran bindings
+
+
+Required Compilation Tools
 
 The compilation tools make, g++, gfortran, and perl must be installed on the system to
-complete the installation.  The "which" command can be used to determine if a 
-tool is installed.  For example, if the command
+complete the installation.  The "which" command can be used to determine if a tool
+is installed.  For example, if the command
 
    $ which make
 
 returns a path, then make is installed.  If nothing is returned, then it is not
 installed.
 
-Missing tools can be installed using the system's package manager. For example,
+Missing tools can be installed using the system's package manager.  For Linux versions
 using the Debian package manager APT (used on Debian, Ubuntu, Linux Mint, and
 others), the commands are
 
@@ -84,14 +97,22 @@ others), the commands are
    $ sudo apt-get install gfortran
    $ sudo apt-get install perl
 
-For Redhat Linux RHEL, the yum package manager is used, with the commands
+For Redhat RHEL, the yum package manager is used with the commands
 
    $ sudo yum install make
    $ sudo yum install g++
    $ sudo yum install gfortran
    $ sudo yum install perl
 
+For Suse SLES, the zypper package manager is used with the commands
+
+   $ sudo zypper install make
+   $ sudo zypper install gcc-c++
+   $ sudo zypper install gcc-fortran
+   $ sudo zypper install perl
+
 Note that installing packages requires system-level installation priviledges.
+
 
 Installation 
 
@@ -130,7 +151,8 @@ Installation
    example installing in the directory $HOME/local:
       $ ./OpenParEM_build --jobs=4 --prefix=$HOME/local --with-all
 
-      In this case, install_dir=$HOME/local
+      In this case, install_dir=$HOME/local.  The directory "local" must
+      exist before running the script.
 
 7. When compilation completes, OpenParEM2D and OpenParEM3D are tested. If
    the two tests pass, then the basic installation is complete and just
