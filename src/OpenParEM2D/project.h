@@ -47,8 +47,10 @@ int removeQuote (char *);
 void removeQuotes (char *);
 
 struct projectData {
-   char* version_name;       // set in init_project 
-   char* version_value;      // set in init_project
+   // name and version number for the project data file format
+   // set in init_project
+   char* version_name; 
+   char* version_value; 
 
    // user settable
 
@@ -122,6 +124,10 @@ struct projectData {
    char *project_name;
    int refinement_refine_converged_modes; // ToDo - needs work.  Produces knots of highly refine mesh in WR90.
    int solution_active_mode_count;
+
+   int version_major;
+   int version_minor;
+   int version_patch;
 };
 
 #endif

@@ -29,6 +29,7 @@
 #include <string>
 #include <chrono>
 #include "misc.hpp"
+#include "project.h"
 
 extern "C" void prefix ();
 extern "C" char* get_prefix_text ();
@@ -135,7 +136,7 @@ class ResultDatabase
       int get_iterationTotal(double);
       chrono::duration<double> frequency_elapsed(double);
       void update_convergence(double, bool, double);
-      void save(const char *);
+      void save(struct projectData *, const char *);
       void save_as_test(const char *, const char *);
       void print();
 };

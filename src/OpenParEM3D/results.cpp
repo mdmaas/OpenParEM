@@ -883,6 +883,12 @@ bool ResultDatabase::save (struct projectData *projData)
       return true;
    }
 
+   if (rank == 0) {
+      out << "[Simulator]" << endl;
+      out << "   OpenParEM3D " << projData->version_major << "." << projData->version_minor << "." << projData->version_patch << endl;
+      out << "[EndSimulator]" << endl;
+   }
+
    long unsigned int i=0;
    while (i < results.size()) {
       results[i]->save(&out,projData,SportCount);
@@ -991,6 +997,7 @@ void ResultDatabase::saveCSV (ostream *out, struct projectData *projData,
    // header
 
    if (rank == 0) {
+      *out << "#OpenParEM3D " << projData->version_major << "." << projData->version_minor << "." << projData->version_patch << endl;
       *out << "#Touchstone format," << projData->touchstone_format << endl;
       *out << "#frequency unit," << projData->touchstone_frequency_unit << endl;
       *out << "#number of frequencies," << unique_frequencies.size() << endl;
@@ -1113,6 +1120,7 @@ bool ResultDatabase::saveTouchstone (struct projectData *projData, BoundaryDatab
       // header
 
       if (rank == 0) {
+         out << "! OpenParEM3D " << projData->version_major << "." << projData->version_minor << "." << projData->version_patch << endl;
          out << "! " << portCount << "-port S-parameter data" << endl;
 
          int i=0;
@@ -1201,7 +1209,10 @@ bool ResultDatabase::saveTouchstone (struct projectData *projData, BoundaryDatab
 
    if (TouchstoneVersion2p0) {
 
-      if (rank == 0) out << "! " << portCount << "-port S-parameter data" << endl;
+      if (rank == 0) {
+         out << "! OpenParEM3D " << projData->version_major << "." << projData->version_minor << "." << projData->version_patch << endl;
+         out << "! " << portCount << "-port S-parameter data" << endl;
+      }
 
       vector<string> infoList;
       int j=0;

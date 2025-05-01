@@ -186,7 +186,7 @@ void FieldPointDatabase::push(FieldPoint *a)
    }
 }
 
-void FieldPointDatabase::save(const char *baseName)
+void FieldPointDatabase::save(struct projectData *projData, const char *baseName)
 {
    if (fieldPointList.size() == 0) return;
 
@@ -196,6 +196,7 @@ void FieldPointDatabase::save(const char *baseName)
    ofstream out;
    out.open(ss.str().c_str(),ofstream::out);
    if (out.is_open()) {
+      out << "#OpenParEM2D " << projData->version_major << "." << projData->version_minor << "." << projData->version_patch << endl;
       out << "#frequency,mode,x,y,Ex_re,Ex_im,Ey_re,Ey_im,Ez_re,Ez_im,Hx_re,Hx_im,Hy_re,Hy_im,Hz_re,Hz_im" << endl;
       unsigned long int i=0;
       while (i < fieldPointList.size()) {

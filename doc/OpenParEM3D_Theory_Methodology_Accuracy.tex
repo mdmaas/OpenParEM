@@ -24,7 +24,7 @@
    \vspace*{3cm}
    {\huge\bfseries OpenParEM3D Theory, Methodology, and Accuracy} \\
    \vskip1cm
-   {\Large Version 2.1} \\
+   {\Large Version 2.0} \\
    \vskip1cm
    {\Large March 2025} \\
    \vskip1cm
@@ -706,9 +706,11 @@ There is one exception where MPI is implemented to avoid run-time problems, and 
 \section{Accuracy Demonstrations}
 \label{sec:accuracy}
 
+Accuracy demonstrations are calculated using versions 2.0 of OpenParEM3D and OpenParEM2D.  Re-running the cases using later (or earlier) versions can fail to precisely reproduce the results because iterative refinement may terminate earlier or later.  To obtain similar results, it may be necessary to adjust the convergence criteria to obtain the same number of iterations.
+
 \subsection{Microstrip Bandpass Filter}
 
-The microstrip bandpass filter described in \cite{Weng} is simulated for comparison with the paper's measurement.  The project can be found in the OpenParEM3D distribution in \texttt{regression/microstrip/filter\_study}.  The layout is done in FreeCAD \cite{FreeCAD} following the dimensions from the paper, and the final drawing is shown in Fig.~\ref{fig:filter_drawing}.  Meshing uses gmsh \cite{gmsh}\cite{gmshweb} with all default settings except that the mesh "Element size factor" is set to 0.5 to reduce the number of large elements.  The starting mesh before adaptive refinement is shown in Fig.~\ref{fig:filter_starting_mesh}.
+The microstrip bandpass filter described in \cite{Weng} is simulated for comparison with the paper's measurement.  The project can be found in the OpenParEM distribution in \texttt{regression/OpenParEM3D/microstrip/filter\_study}.  The layout is done in FreeCAD \cite{FreeCAD} following the dimensions from the paper, and the final drawing is shown in Fig.~\ref{fig:filter_drawing}.  Meshing uses gmsh \cite{gmsh}\cite{gmshweb} with all default settings except that the mesh "Element size factor" is set to 0.5 to reduce the number of large elements.  The starting mesh before adaptive refinement is shown in Fig.~\ref{fig:filter_starting_mesh}.
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.7\textwidth]{../regression/OpenParEM3D/microstrip/filter_study/screenshots/filter_drawing}
@@ -843,7 +845,7 @@ The starting mesh for the ports have very high aspect ratio elements ($\approx 1
 
 \subsection{Square Monopole Antenna}
 
-The planar monopole antenna described in \cite{Wong} is simulated for comparison with the paper's measurement.  The project can be found in the OpenParEM3D distribution in \texttt{regression/antenna/square\_monopole\_study}.  The layout is done in FreeCAD following the dimensions from the paper, and the final drawing is shown in Fig.~\ref{fig:square_planar_drawing} along with the coaxial feed with the port outlined in green.  The paper does not describe how the antenna mounts to the connector, how the connector pin is treated, nor the drilled hole size in the ground plane, so the drawn antenna makes reasonable guesses at these, but some impact on the results is expected.
+The planar monopole antenna described in \cite{Wong} is simulated for comparison with the paper's measurement.  The project can be found in the OpenParEM distribution in \texttt{regression/OpenParEM3D/antenna/square\_monopole\_study}.  The layout is done in FreeCAD following the dimensions from the paper, and the final drawing is shown in Fig.~\ref{fig:square_planar_drawing} along with the coaxial feed with the port outlined in green.  The paper does not describe how the antenna mounts to the connector, how the connector pin is treated, nor the drilled hole size in the ground plane, so the drawn antenna makes reasonable guesses at these, but some impact on the results is expected.
 
 \begin{figure}[H]
   \centering
@@ -903,7 +905,7 @@ Order & Wavelength Fraction & Fitting Error \\
 
 \subsection{Microstrip Bridge}
 
-The microstrip bridge described in \cite{Wang} is simulated for comparison with the paper's simulation.  The bridge inserts a break in a microstrip line with the conductor bridging between the two microstrip sections through an area that is uniformly filled with a dielectric taking values of 1, 2.32, 3.78, and 9.8.  The project can be found in the OpenParEM3D distribution in \texttt{regression/microstrip/bridge\_study}.  The layout is done in FreeCAD following the dimensions from the paper, and the final drawing is shown in Fig.~\ref{fig:bridge_drawing}.  Meshing uses gmsh with all default settings except that the mesh "Element size factor" is set to 0.5 to reduce the number of large elements.
+The microstrip bridge described in \cite{Wang} is simulated for comparison with the paper's simulation.  The bridge inserts a break in a microstrip line with the conductor bridging between the two microstrip sections through an area that is uniformly filled with a dielectric taking values of 1, 2.32, 3.78, and 9.8.  The project can be found in the OpenParEM distribution in \texttt{regression/OpenParEM3D/microstrip/bridge\_study}.  The layout is done in FreeCAD following the dimensions from the paper, and the final drawing is shown in Fig.~\ref{fig:bridge_drawing}.  Meshing uses gmsh with all default settings except that the mesh "Element size factor" is set to 0.5 to reduce the number of large elements.
 
 \begin{figure}[H]
   \centering
@@ -934,7 +936,7 @@ It is interesting to note that the simulation with  5$^{\textnormal{th}}$-order 
 
 \subsection{Slotline Step}
 
-The slotline step in width described in \cite{Hirayama} is simulated for comparison with the paper's simulation.  The project can be found in the OpenParEM3D distribution in \texttt{regression/slotline/step\_study}.  Applying symmetry, half of the structure is drawn in FreeCAD following the dimensions from the paper, and the final drawing is shown in Fig.~\ref{fig:step_drawing}.  Meshing uses gmsh with all default settings.
+The slotline step in width described in \cite{Hirayama} is simulated for comparison with the paper's simulation.  The project can be found in the OpenParEM distribution in \texttt{regression/OpenParEM3D/slotline/step\_study}.  Applying symmetry, half of the structure is drawn in FreeCAD following the dimensions from the paper, and the final drawing is shown in Fig.~\ref{fig:step_drawing}.  Meshing uses gmsh with all default settings.
 
 \begin{figure}[H]
   \centering
@@ -961,7 +963,7 @@ The simulation uses 3$^{\textnormal{rd}}$-order elements and adaptive mesh refin
 
 \subsection{Waveguide T-Junction}
 
-The WR75 T-Junction described in \cite{Alessandri} is simulated for comparison with the paper's simulation.  The project is in the OpenParEM3D distribution in \texttt{regression/WR75/T-Junction\_study}.  The structure is drawn in FreeCAD as shown in Fig.~\ref{fig:junction_drawing}.  Shown in Fig.~\ref{fig:junction_mesh}, the mesh is built using gmsh with all default settings except that the mesh "Element size factor" is set to 0.75.
+The WR75 T-Junction described in \cite{Alessandri} is simulated for comparison with the paper's simulation.  The project is in the OpenParEM distribution in \texttt{regression/OpenParEM3D/WR75/T-Junction\_study}.  The structure is drawn in FreeCAD as shown in Fig.~\ref{fig:junction_drawing}.  Shown in Fig.~\ref{fig:junction_mesh}, the mesh is built using gmsh with all default settings except that the mesh "Element size factor" is set to 0.75.
 
 \begin{figure}[H]
   \centering
@@ -995,7 +997,7 @@ The simulation uses 4$^{\textnormal{th}}$-order elements with no adaptive refine
 
 \subsection{WR75 Puck Discontinuity}
 
-The WR75 with dielectric puck discontinuity described in \cite{Ise} is simulated with results comparison to both \cite{Ise} and \cite{Hirayama}.  The project is in the OpenParEM3D distribution in \texttt{regression/WR75/dielectric-loading\_study}.  The structure is drawn in FreeCAD as shown in Fig.~\ref{fig:loading_drawing}, and the mesh is built using gmsh with all default settings.
+The WR75 with dielectric puck discontinuity described in \cite{Ise} is simulated with results comparison to both \cite{Ise} and \cite{Hirayama}.  The project is in \texttt{regression/OpenParEM3D/WR75/dielectric-loading\_study} of the OpenParEM distribution.  The structure is drawn in FreeCAD as shown in Fig.~\ref{fig:loading_drawing}, and the mesh is built using gmsh with all default settings.
 
 \begin{figure}[H]
   \centering
@@ -1020,8 +1022,8 @@ For this accuracy study, the relative tolerance is set very tight at 0.001 for A
 \subsection{Lossy Stripline}
 
 The lossy stripline described in \cite{Simonovich} is simulated for comparison with the paper's simulation and measurement.
-The project can be found in the OpenParEM3D distribution in \texttt{regression/stripline/Simonovich\_stripline\_study}.
-Using the file \texttt{regression/stripline/Simonovich\_stripline\_study/builder.txt}, the structure is generated using builder [see "OpenParEM2D\_User\_Manual.pdf].
+The project can be found in \texttt{regression/OpenParEM3D/stripline/Simonovich\_stripline\_study} of the OpenParEM distribution.
+Using the file \texttt{regression/OpenParEM3D/stripline/Simonovich\_stripline\_study/builder.txt}, builder [see "OpenParEM2D\_User\_Manual.pdf"] is used to generate the structure..
 A section just 1~mm long is constructed, and the results are multiplied by 6*25.4 to obtain results for a 6~in line.
 The structure drawing is shown in Fig.~\ref{fig:stripline_drawing}, where extra physical detail is automatically added by builder to focus meshing on the trace edges.
 
@@ -1052,7 +1054,7 @@ The structure is simulated with 2$^{\textnormal{nd}}$-order elements with adapti
 
 \subsection{Lossless WR90 Rectangular Waveguide}
 
-A 100~mm-long straight section of lossless WR90 rectangular waveguide is simulated at 9~GHz to extremes to test accuracy, self-consistency, numerical noise floors, and adaptive mesh refinement.  The correct answers are known analytically as $|\textnormal{S11}|=0$, $|\textnormal{S21}|=1$, and S21 phase=-20.753057470156$^\circ$, so exact error calculations can be made.  Note that all of the regression suite cases using WR90 rectangular waveguide also make error calculations against analytical results.  The project can be found in the OpenParEM3D distribution in \texttt{regression/WR90/straight\_study}.
+A 100~mm-long straight section of lossless WR90 rectangular waveguide is simulated at 9~GHz to extremes to test accuracy, self-consistency, numerical noise floors, and adaptive mesh refinement.  The correct answers are known analytically as $|\textnormal{S11}|=0$, $|\textnormal{S21}|=1$, and S21 phase=-20.753057470156$^\circ$, so exact error calculations can be made.  Note that all of the regression suite cases using WR90 rectangular waveguide also make error calculations against analytical results.  The project can be found in the OpenParEM distribution in \texttt{regression/OpenParEM3D/WR90/straight\_study}.
 
 The rectangular waveguide is set up in FreeCAD then minimally meshed with gmsh, and the resulting mesh is shown in Fig.~\ref{fig:WR90mesh}.  At 9~GHz this mesh is very coarse, with the longest tetrahedron edge 1.53$\lambda$ long.  Overall, the waveguide is 2.058$\lambda$ long as shown by the field plot in Fig.~\ref{fig:WR90ReEy}.
 

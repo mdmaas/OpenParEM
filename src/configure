@@ -6412,7 +6412,8 @@ fi
 
 
 # Paths
-LDFLAGS="$LDFLAGS -L${prefix}/lib -L/usr/lib/x86_64-linux-gnu"
+#LDFLAGS="$LDFLAGS -L${prefix}/lib -L/usr/lib/x86_64-linux-gnu"
+LDFLAGS="$LDFLAGS -L${prefix}/lib -L${prefix}/lib64"
 CXXFLAGS="$CXXFLAGS -I${prefix}/include"
 CFLAGS="$CFLAGS -I${prefix}/include"
 

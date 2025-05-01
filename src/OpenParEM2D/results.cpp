@@ -271,7 +271,7 @@ void ResultDatabase::update_convergence(double frequency, bool converged, double
    }
 }
 
-void ResultDatabase::save(const char *projFile)
+void ResultDatabase::save(struct projectData *projData, const char *projFile)
 {
    double NpTodB=20*log10(exp(1));
    double ko;
@@ -300,6 +300,7 @@ void ResultDatabase::save(const char *projFile)
          // header line
          if (!printedHeader) {
             printedHeader=true;
+            out << "#OpenParEM2D " << projData->version_major << "." << projData->version_minor << "." << projData->version_patch << endl;
             out << "#frequency,iteration,mesh size,matrix size,converged,final error,elapsed time (s),modal impedance calculation,mode count";
 
             long unsigned int j=0;

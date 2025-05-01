@@ -27,6 +27,7 @@
 #include <sstream>
 #include <string>
 #include "misc.hpp"
+#include "project.h"
 
 extern "C" void prefix ();
 extern "C" char* get_prefix_text ();
@@ -101,7 +102,7 @@ class FieldPointDatabase {
       ~FieldPointDatabase();
       FieldPoint* get_FieldPoint(long unsigned int i) {return fieldPointList[i];}
       void push(FieldPoint *);
-      void save(const char *);
+      void save(struct projectData *, const char *);
       void save_as_test(const char *, const char *);
       void normalize();
       void print();

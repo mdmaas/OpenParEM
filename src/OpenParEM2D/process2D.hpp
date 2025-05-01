@@ -188,19 +188,19 @@ class TestCaseDatabase
    private:
       vector<TestCase *> testCaseList;
    public:
-      ~TestCaseDatabase();
+      ~TestCaseDatabase ();
       bool loadTestCases (const char *);
-      bool is_populated() {if (testCaseList.size() > 0) return true; return false;}
-      void evaluate(ResultDatabase *, EMfieldDatabase *);
-      void show_evaluation(ostream *);
-      void audit(string, string);
-      void print();
-      void printAllFormatted();
-      void print_as_testcase();
-      void sort(bool);
-      void trim_error();
-      bool all_evaluated();
-      bool all_passed();
+      bool is_populated () {if (testCaseList.size() > 0) return true; return false;}
+      void evaluate (ResultDatabase *, EMfieldDatabase *);
+      void show_evaluation (ostream *);
+      void audit (string, string);
+      void print ();
+      void printAllFormatted ();
+      void print_as_testcase ();
+      void sort (bool);
+      void trim_error ();
+      bool all_evaluated ();
+      bool all_passed ();
 };
 
 

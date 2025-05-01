@@ -30,8 +30,14 @@ cd OpenParEM/tutorials
 cd ../..
 
 # source code distribution - also a full backup with executables removed
-tar --exclude='.git' --exclude='OpenParEM/bin' --exclude='OpenParEM/etc' --exclude='OpenParEM/include' --exclude='OpenParEM/lib' --exclude='OpenParEM/sbin' --exclude='OpenParEM/share' -zcf OpenParEM_${CURRENTDATE}.tar.gz OpenParEM
+tar --exclude='.git' --exclude='OpenParEM/bin' --exclude='OpenParEM/etc' --exclude='OpenParEM/include' --exclude='OpenParEM/lib' --exclude='OpenParEM/lib64' --exclude='OpenParEM/sbin' --exclude='OpenParEM/share' --exclude='OpenParEM/libexec' -zcf OpenParEM_${CURRENTDATE}.tar.gz OpenParEM
 
 # binary distribution - without external packages, source code, and include files
-tar --exclude='.git' --exclude='OpenParEM/external_packages' --exclude='OpenParEM/include' --exclude='OpenParEM/sbin' --exclude='OpenParEM/src' -zcf OpenParEM_bin_${CURRENTDATE}.tar.gz OpenParEM
+#tar --exclude='.git' --exclude='OpenParEM/external_packages' --exclude='OpenParEM/include' --exclude='OpenParEM/sbin' --exclude='OpenParEM/src' -zcf OpenParEM_bin_${CURRENTDATE}.tar.gz OpenParEM
+
+tar --exclude='.git' --exclude='OpenParEM/external_packages' --exclude='OpenParEM/include' --exclude='OpenParEM/bin' --exclude='OpenParEM/sbin' --exclude='OpenParEM/src' --exclude='OpenParEM/libexec' -cf OpenParEM_bin_${CURRENTDATE}.tar OpenParEM
+
+tar -rf OpenParEM_bin_${CURRENTDATE}.tar OpenParEM/bin/OpenParEM2D OpenParEM/bin/OpenParEM3D OpenParEM/bin/process2D OpenParEM/bin/process3D OpenParEM/bin/simplify2D OpenParEM/bin/simplify3D OpenParEM/bin/builder OpenParEM/bin/mpirun OpenParEM/bin/ort*
+
+gzip OpenParEM_bin_${CURRENTDATE}.tar
 

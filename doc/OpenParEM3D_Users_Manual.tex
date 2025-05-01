@@ -97,11 +97,7 @@ Installation and execution instructions are provided in a separate document call
 \section{Files}
 \label{sec:files}
 
-OpenParEM3D is a command-line tool that takes one and only one input, and that is a text project control file.  To run serially on a single core or processor, the command is
-\begin{Verbatim}[fontsize=\small]
-   $ OpenParEM3D projectname.proj
-\end{Verbatim}
-and in parallel it is
+OpenParEM3D is a command-line tool that takes one and only one input, and that is a text project control file.  To run OpenParEM3D, the command is
 \begin{Verbatim}[fontsize=\small]
    $ mpirun -q --oversubscribe -np N OpenParEM3D projectname.proj
 \end{Verbatim}
@@ -822,10 +818,6 @@ $ cd rectangular_waveguide
 
 \item Run OpenParEM3D at the command line with
 \begin{Verbatim}[fontsize=\small]
-   $ OpenParEM3D rectangular_waveguide.proj
-\end{Verbatim}
-to run serially with a single core or with
-\begin{Verbatim}[fontsize=\small]
    $ mpirun -q --oversubscribe -np 12 OpenParEM3D rectangular_waveguide.proj
 \end{Verbatim}
 to run in parallel with 12 cores.  Substitute a larger or smaller core number as needed.  The option \verb+--oversubscribe+ is not needed if the number of cores is less than or equal to half the number of available cores.
@@ -1040,10 +1032,6 @@ reference.impedance            0
 See Appendix~\ref{sec:control_file_spec} for a complete list of available keyword/value pairs that can be included in the project control file. Note that the reference impedance in the setup file is set to 0, so no renomalization of the S-parameters is performed.
 
 \item Run OpenParEM3D at the command line with
-\begin{Verbatim}[fontsize=\small]
-   $ OpenParEM3D microstrip_step.proj
-\end{Verbatim}
-to run serially with a single core or with
 \begin{Verbatim}[fontsize=\small]
    $ mpirun -q --oversubscribe -np 12 OpenParEM3D microstrip_step.proj
 \end{Verbatim}

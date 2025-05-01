@@ -47,7 +47,7 @@
 \newpage
 \section{Introduction}
 
-OpenParEM consists of the 3D simulator OpenParEM3D and the 2D simulator OpenParEM2D plus some helper tools.  All can be compiled from source or installed as pre-compiled bindaries.
+OpenParEM consists of the 3D simulator OpenParEM3D and the 2D simulator OpenParEM2D plus some helper tools.  All can be compiled from source or installed as pre-compiled bindaries for x86 architectures.
 
 OpenParEM uses command-line tools for solving electromagnetic problems once provided with the necessary input files.  The primary required input files are a mesh describing the geometry, text files describing modes for OpenParEM2D and ports for OpenParEM3D, and a text project control file.  The user is responsible for pulling together the necessary tools to create the needed files.
 
@@ -55,25 +55,21 @@ Assembling a tool flow is a very significant task.  For the development of OpenP
 
 \section{Installing Pre-compiled Binaries}
 
-Pre-compiled binaries are available for x86 Linux and do not require administrator priviledges.  Binaries are verified for the following Linux flavors:
-\begin{itemize}[nosep]
-   \item Ubuntu 22.04.5 LTS
-   \item Ubuntu 24.04.2 LTS
-\end{itemize}
-
+Pre-compiled binaries are available for x86 Linux and do not require administrator priviledges.
 The basic steps for installing binaries are listed below.  See the INSTALL file for more details and installation options.
 \begin{itemize}[nosep]
    \item Download the installation package OpenParEM\_bin\_\textit{version}.tar.gz from \verb+https://openparem.org+
    \item Unpack the package:
          \begin{Verbatim}
 $ tar -xf OpenParEM_bin_version.tar.gz
+$ ln -s OpenParEM_version OpenParEM
          \end{Verbatim}
    \item Change into the base directory and view the installation instructions:
          \begin{Verbatim}
 $ cd OpenParEM
 $ more INSTALL
          \end{Verbatim}
-   \item Set the required PATH and environment variables.  See the INSTALL file for details.
+   \item Set the PATH to include the bin and scripts directories.  See the INSTALL file for details.
    \item Install Python scripts for FreeCAD and ParaView:
          \begin{Verbatim}
 $ cd scripts
@@ -89,32 +85,28 @@ $ OpenParEM_test
 
 \section{Compiling from Source}
 
-OpenParEM can be compiled for Linux-based operating systems and does not require administrator priviledges if the needed build tools make, g++, gfortran, and perl are already installed. Compilation is verified for the following Linux flavors:
-\begin{itemize}[nosep]
-   \item Ubuntu 22.04.5 LTS
-   \item Ubuntu 24.04.2 LTS
-\end{itemize}
-
+OpenParEM can be compiled for Linux-based operating systems and does not require administrator priviledges if the needed build tools make, g++, gfortran, and perl are already installed.
 The basic steps for compilation are listed below.  See the INSTALL file for more details and options.
 \begin{itemize}[nosep]
-   \item Download the installation package OpenParEM-textit{version}.tar.gz from \verb+https://openparem.org+
+   \item Download the installation package OpenParEM-\textit{version}.tar.gz from \verb+https://openparem.org+
    \item Unpack the package:
          \begin{Verbatim}
 $ tar -xf OpenParEM-version.tar.gz
+$ ln -s OpenParEM-version OpenParEM
          \end{Verbatim}
    \item Change into the base directory and view the installation instructions:
          \begin{Verbatim}
-$ cd OpenParEM-version
+$ cd OpenParEM
 $ more INSTALL
          \end{Verbatim}
-   \item Install make, g++, and/or gfortran as needed.
+   \item Install make, g++, gfortran, and/or perl as needed.
    \item Change into the scripts directory and compile:
          \begin{Verbatim}
 $ cd scripts
 $ ./OpenParEM_build --jobs=4 --with-all
          \end{Verbatim}
    \item On successful compilation, OpenParEM2D and OpenParEM3D are tested.  If both tests report \texttt{pass}, then compilation is complete.
-   \item Set the required PATH and environment variables.  See the INSTALL file for details.
+   \item Set PATH to include the bin and scripts directories.  See the INSTALL file for details.
    \item Verify that paths and environment variables have been properly set by re-running the tests:
          \begin{Verbatim}
 $ OpenParEM_test
@@ -271,19 +263,13 @@ The program tline3 is a custom solver for the cascade of three transmission line
 
 \section{Execution}
 
-OpenParEM2D and OpenParEM3D are command-line tools executed with the following commands when parallel processing
+OpenParEM2D and OpenParEM3D are command-line tools executed with the following commands
 \begin{verbatim}
    $ mpirun -q --oversubscribe -np N OpenParEM2D my_project.proj 
    $ mpirun -q --oversubscribe -np N OpenParEM3D my_project.proj 
 \end{verbatim}
-and 
-\begin{verbatim}
-   $ OpenParEM2D my_project.proj
-   $ OpenParEM3D my_project.proj
-\end{verbatim}
-when running in serial on a single core.  Running on a single core is sometimes convenient when getting a new project up-and-running.
 
-When parallel processing, the \verb+-np+ option specifies the number of cores to use for the simulation, given by \verb+N+.  The \verb+-q+ option suppresses messages from the MPI infrastructure, which are rarely needed.  The \verb+--oversubscribe+ is required with OpenParEM3D when \verb+N+ is more than half the number of available cores.  
+The \verb+-np+ option specifies the number of cores to use for the simulation, given by \verb+N+.  The \verb+-q+ option suppresses messages from the MPI infrastructure, which are rarely needed.  The \verb+--oversubscribe+ is required with OpenParEM3D when \verb+N+ is more than half the number of available cores.  
 
 The number of cores to specify, \verb+N+, requires some consideration.  If the simulations are being spread across multiple computers, it is assumed that the user knows about MPI processing considerations and no further comments are provided.  For simulations on a single computer, \verb+N+ should always be set to equal to or less than the number of physical cores.  For high-performance computing, there is not sufficient left-over capacity for threads to be utilized.  Depending on the computer, setting \verb+N+ to the number of physical cores can (and probably will) run slower than if \verb+N+ is set to a lower number.  The reason is that the available bandwidth on the CPU itself and to/from memory becomes saturated, so adding more cores causes MPI messages to be delayed due to limited bandwidth, slowing overall performance.  Experimenting with the value of \verb+N+ can identify the value that produces the fastest run times for a given computer.  Different computers have different optimal values of \verb+N+.  See Sec.~\ref{sec:computer} for additional discussion.
 
@@ -324,7 +310,7 @@ To recap, populate all memory channels with memory sticks to maximize bandwidth.
          &                & - Updated installation documentation for Ubuntu 24.04.1 LTS \\
    2.0.0 & Mar. 4, 2025   & - Added detail for clarification \\
          &                & - Rev'ed the release to 2.0.0 to align with OpenParEM3D \\
-   2.1.0 & April 23, 2025   & - Revamped for the merging of the OpenParEMCommon, OpenParEM2D, and OpenParEM3D into a single project \\
+   2.1.0 & April 29, 2025   & - Revamped for the merging of the OpenParEMCommon, OpenParEM2D, and OpenParEM3D into a single project \\
          &                & - Updated for new build script \\
     \hline
 \end{longtable}

@@ -26,7 +26,8 @@ AC_CHECK_LIB([pthread], [pthread_mutex_init], ,AC_MSG_ERROR([cannot link to libp
 AC_CHECK_LIB([dl], [dlvsym], ,AC_MSG_ERROR([cannot link to libdl; check config.log]))
 
 # Paths
-LDFLAGS="$LDFLAGS -L${prefix}/lib -L/usr/lib/x86_64-linux-gnu"
+#LDFLAGS="$LDFLAGS -L${prefix}/lib -L/usr/lib/x86_64-linux-gnu"
+LDFLAGS="$LDFLAGS -L${prefix}/lib -L${prefix}/lib64"
 CXXFLAGS="$CXXFLAGS -I${prefix}/include" 
 CFLAGS="$CFLAGS -I${prefix}/include"
 

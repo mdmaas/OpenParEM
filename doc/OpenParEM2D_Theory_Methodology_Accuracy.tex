@@ -23,9 +23,9 @@
    \vspace*{3cm}
    {\huge\bfseries OpenParEM2D Theory, Methodology, and Accuracy} \\
    \vskip1cm
-   {\Large Version 2.1} \\
+   {\Large Version 2.0} \\
    \vskip1cm
-   {\Large April 2025} \\
+   {\Large March 2025} \\
    \vskip1cm
    {\Large Brian Young} \\
 
@@ -544,10 +544,12 @@ All parallel functions in MFEM are collective.
 
 A few cases are covered in detail to demonstrate accuracy levels for OpenParEM2D.  Besides these examples, the cases included in the regression suite can also be examined for accuracy since they all compare to either exact results or to results from the literature, although the regression suite cases are not set up to demonstrate maximum accuracy.
 
+Accuracy demonstrations are calculated using version 2.0 of OpenParEM2D.  For cases using iterative refinement, re-running the cases using later (or earlier) versions can fail to precisely reproduce the results because iterative refinement may terminate earlier or later.  To obtain similar results, it may be necessary to adjust the convergence criteria to obtain the same number of iterations.
+
 \subsection{Lossless WR90 Waveguide}
 \label{sec:WR90_lossless}
 
-Lossless WR90 rectangular waveguide is simulated for comparison against exact results.  The project can be found in the OpenParEM2D distribution in \texttt{regression/WR90\_rectangular\_waveguide/WR90/WR90\_order\_6\_study}. The solution uses 6$^{\textnormal{th}}$-order finite elements.  The mesh is re-optimized at each frequency starting with a very sparse mesh of just 4 elements that is uniformly refined once then adaptively refined. The optimization variable is $|\gamma|$ with a relative tolerance of $10^{-9}$ with two consecutive iterations and a solution tolerance of $10^{-13}$.  Tighter settings can achieve somewhat lower errors, but completing the frequency sweep becomes difficult.  The first 5 modes are simulated and compared to the exact theoretical result calculated by \texttt{waveguide.c} in the OpenParEM2D source directory.
+Lossless WR90 rectangular waveguide is simulated for comparison against exact results.  The project can be found in \texttt{regression/OpenParEM2D/WR90\_rectangular\_waveguide/WR90/WR90\_order\_6\_study} of the OpenParEM distribution. The solution uses 6$^{\textnormal{th}}$-order finite elements.  The mesh is re-optimized at each frequency starting with a very sparse mesh of just 4 elements that is uniformly refined once then adaptively refined. The optimization variable is $|\gamma|$ with a relative tolerance of $10^{-9}$ with two consecutive iterations and a solution tolerance of $10^{-13}$.  Tighter settings can achieve somewhat lower errors, but completing the frequency sweep becomes difficult.  The first 5 modes are simulated and compared to the exact theoretical result calculated by \texttt{waveguide.c} in the OpenParEM2D source directory.
 
 The propagation constant $\gamma$ is shown in Fig.~\ref{fig:WR90_gamma}, where $\gamma$ is plotted as either $\alpha/k_{\circ}$ when a mode is cut off or $\beta/k_{\circ}$ when it is propagating.  The error vs. the exact theoretical result is shown in Fig.~\ref{fig:WR90_gamma_error}, where the baseline error is about $10^{-12}$ except for the expected increase as $\gamma$ transitions through zero.
 
@@ -593,7 +595,7 @@ An interesting but not very useful plot of the real power flow in the longitudin
 
 The lossless WR90 waveguide of Sec.~\ref{sec:WR90_lossless} is re-simulated for the dominant mode including finite conductivity on the walls of the waveguide.  OpenParEM2D first simulates the lossless case then uses the computed fields to calculate the losses on the conductive boundaries and adds those losses to the dielectric losses directly computed as part of the eigenvalue problem solution.  For this case, there are no dielectric losses, so all of the losses are due to the losses on the finite-conductivity boundary.
 
-The lossy WR90 rectangular waveguide project can be found in the OpenParEM2D distribution in \texttt{regression/WR90\_rectangular\_waveguide/WR90/WR90\_order\_6\_lossy\_study}. The solution uses 6$^{\textnormal{th}}$-order finite elements. The mesh is optimized at 11~GHz starting with a very sparse mesh of just 4 elements that is then uniformly refined once then adaptively refined. The optimization variable is $\alpha$ with a relative tolerance of $10^{-10}$ with two consecutive iterations and a solution tolerance of $10^{-13}$. After optimization at 11~GHz, the frequency is swept from 6.75~GHz to 15~GHz.
+The project can be found in \texttt{regression/OpenParEM2D/WR90\_rectangular\_waveguide/WR90/WR90\_order\_6\_lossy\_study} of the OpenParEM distribution. The solution uses 6$^{\textnormal{th}}$-order finite elements. The mesh is optimized at 11~GHz starting with a very sparse mesh of just 4 elements that is then uniformly refined once then adaptively refined. The optimization variable is $\alpha$ with a relative tolerance of $10^{-10}$ with two consecutive iterations and a solution tolerance of $10^{-13}$. After optimization at 11~GHz, the frequency is swept from 6.75~GHz to 15~GHz.
 
 The propagation constant $\gamma$ is shown in Fig.~\ref{fig:WR90_lossy_gamma}.  The theoretical result is provided by \cite{Ramo} in (17) on p.~417, and the error vs. the theoretical result is shown in Fig.~\ref{fig:WR90_lossy_gamma_error}.  At the mesh optimization frequency of 11~GHz, the error for $\alpha/k_{\circ}$ is about $10^{-10}$ and about $10^{-12}$ for $\beta/k_{\circ}$.  Over the entire sweep, the worst-case error for $\alpha/k_{\circ}$ drops about 1 order of magnitude, while for $\beta/k_{\circ}$ it drops less than 2 orders of magnitude as frequency decreases, so the error is still excellent over this 2:1 frequency span with a mesh optimized at a center frequency.
 
@@ -613,7 +615,7 @@ The propagation constant $\gamma$ is shown in Fig.~\ref{fig:WR90_lossy_gamma}.  
 
 \subsection{Partially-Filled Rectangular Waveguide}
 
-A lossless partially-filled rectangular waveguide is simulated for comparison against numerical solution of the transcendental equation of the exact result. The project can be found in the OpenParEM2D distribution in \texttt{regression/partially\_filled\_rect\_waveguide/PartFilled\_order\_6\_study}.  The studied example is taken from \cite{Harrington}, Fig.~4.7 on p.~161.  The waveguide is shown in Fig.~\ref{fig:partial_drawing}.
+A lossless partially-filled rectangular waveguide is simulated for comparison against numerical solution of the transcendental equation of the exact result. The project can be found in the OpenParEM distribution in \texttt{regression/OpenParEM2D/partially\_filled\_rect\_waveguide/PartFilled\_order\_6\_study}.  The studied example is taken from \cite{Harrington}, Fig.~4.7 on p.~161.  The waveguide is shown in Fig.~\ref{fig:partial_drawing}.
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.3\textwidth]{../regression/OpenParEM2D/partially_filled_rect_waveguide/PartFilled_order_6_study/screenshots/partial_drawing}
@@ -657,7 +659,7 @@ Plots of the dominant mode at 10~GHz are shown in Fig.~\ref{fig:partial_field_po
 
 \subsection{Coaxial Waveguide}
 
-A lossless coaxial waveguide is simulated for comparison against exact results.  The project can be found in the OpenParEM2D distribution in \texttt{regression/coaxEighth\_study}.  The coax has an inner conductor radius of 0.406~mm, an outer radius of 1.48~mm, and a dielectric with $\epsilon_r=2.26$.  The structure is drawn in FreeCAD using polygons with 10 segments per 45$^{\circ}$. Using symmetry with PMC boundaries, 1/8 of the structure is simulated.  Assuming perfect circles, the exact impedance is 51.5874640385028~$\Omega$.  Since this is a lossless TEM transmission line, the exact value for $\beta/k_{\circ}=\sqrt{2.26}$.
+A lossless coaxial waveguide is simulated for comparison against exact results.  The project can be found in the OpenParEM distribution in \texttt{regression/OpenParEM2D/coaxEighth\_study}.  The coax has an inner conductor radius of 0.406~mm, an outer radius of 1.48~mm, and a dielectric with $\epsilon_r=2.26$.  The structure is drawn in FreeCAD using polygons with 10 segments per 45$^{\circ}$. Using symmetry with PMC boundaries, 1/8 of the structure is simulated.  Assuming perfect circles, the exact impedance is 51.5874640385028~$\Omega$.  Since this is a lossless TEM transmission line, the exact value for $\beta/k_{\circ}=\sqrt{2.26}$.
 
 The simulation uses 2$^{\textnormal{nd}}$-order finite elements with adaptive refinement stepping down in frequency from 10,000~GHz to 10~MHz in 10$\times$ steps to avoid potential convergence issues at low frequencies.  Since the mesh is refined multiple times, the relative tolerance is set to a somewhat loose value of $10^{-5}$ converging on $|Z_{\circ}|$.
 
@@ -693,7 +695,7 @@ The results are plotted as errors vs. the exact values in Fig.~\ref{fig:coax_res
 
 \subsection{Coupled Microstrip}
 
-A coupled microstrip is simulated and compared to the simulations for the case in Fig.~8 from \cite{Olyslager}.  The project can be found in the OpenParEM2D distribution in \texttt{regression/differential\_pair/diff\_pair\_study}.  The structure is drawn and set up in FreeCAD, meshed with gmsh \cite{gmsh}\cite{gmshweb}, then solved using 3$^{\textnormal{rd}}$-order finite elements with adaptive refinement sequencing from 100~GHz to 52~GHz to 8~GHz with a relative tolerance of 0.001 optimizing on $|Z_{\circ}|$.
+A coupled microstrip is simulated and compared to the simulations for the case in Fig.~8 from \cite{Olyslager}.  The project can be found in the OpenParEM distribution in \texttt{regression/OpenParEM2D/differential\_pair/diff\_pair\_study}.  The structure is drawn and set up in FreeCAD, meshed with gmsh \cite{gmsh}\cite{gmshweb}, then solved using 3$^{\textnormal{rd}}$-order finite elements with adaptive refinement sequencing from 100~GHz to 52~GHz to 8~GHz with a relative tolerance of 0.001 optimizing on $|Z_{\circ}|$.
 
 The initial mesh produced by gmsh is shown in Fig.~\ref{fig:diffpair_initial_mesh}.  After adaptive mesh refinement, the final mesh is shown in Fig.~\ref{fig:diffpair_optimized_mesh}, where the adaptive mesh refinement algorithm has concentrated mesh refinement in areas of rapid changes in the fields near the corners of the strips.
 \begin{figure}[H]
@@ -739,7 +741,7 @@ Plots of the fields at 52~GHz are shown in Fig.~\ref{fig:diffpair_even_plot} for
 
 \subsection{Lossy Stripline}
 
-A lossy stripline is simulated and compared to the simulations and measurements from the case in Fig.~16, right-hand graph, from \cite{Simonovich}.  The project can be found in the OpenParEM2D distribution in \texttt{regression/Simonovich\_stripline\_study}.  The structure is set up using \texttt{builder}, meshed with gmsh, then solved using 2$^{\textnormal{nd}}$-order finite elements with adaptive refinement at 50~GHz optimizing on alpha.  This case demonstrates the accuracy of the surface roughness modeling.
+A lossy stripline is simulated and compared to the simulations and measurements from the case in Fig.~16, right-hand graph, from \cite{Simonovich}.  The project can be found in \texttt{regression/OpenParEM2D/Simonovich\_stripline\_study} of the OpenParEM distribution.  The structure is set up using \texttt{builder}, meshed with gmsh, then solved using 2$^{\textnormal{nd}}$-order finite elements with adaptive refinement at 50~GHz optimizing on alpha.  This case demonstrates the accuracy of the surface roughness modeling.
 
 The initial mesh in Fig.~\ref{fig:stripline_initial_mesh} is fairly dense with extensive mesh away from the strip.  This makes the problem susceptible to over-meshing.  Since the bulk of the needed mesh refinement is near the corners of the trace, a low value of 0.01 is set for \texttt{mesh.refinement.fraction} so that a relatively small number of elements are refined at each pass, minimizing the number of elements refined away from the trace. Second order elements also help minimize issues with over-meshing with the large number of elements far from the trace having virtually no field variation.  Two signs of over-meshing that can appear with this simulation are failure to converge with a tight convergence tolerance and failure of convergence for $\overline{H}$ without setting a much smaller value for \texttt{solution.tolerance}, such as $10^{-8}$. The final mesh is shown in Fig.~\ref{fig:stripline_final_mesh} along with zooms in Figs.~\ref{fig:stripline_mesh_zoom1} and \ref{fig:stripline_mesh_zoom2}.
 

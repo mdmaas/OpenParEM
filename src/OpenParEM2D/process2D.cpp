@@ -386,7 +386,7 @@ void TestCaseDatabase::audit(string variableType, string function)
    }
 }
 
-void TestCaseDatabase::printAllFormatted()
+void TestCaseDatabase::printAllFormatted ()
 {
    unsigned long int i=0;
    while (i < testCaseList.size()) {
@@ -395,7 +395,7 @@ void TestCaseDatabase::printAllFormatted()
    }
 }
 
-void TestCaseDatabase::show_evaluation(ostream *out)
+void TestCaseDatabase::show_evaluation (ostream *out)
 {
    *out << "# TestCaseDatabase::show_evaluation" << endl;
    *out << "# name,status,frequency,mode,";

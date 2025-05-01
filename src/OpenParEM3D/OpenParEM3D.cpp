@@ -43,6 +43,10 @@
 using namespace std;
 using namespace mfem;
 
+int version_major=2;
+int version_minor=1;
+int version_patch=0;
+
 extern "C" void init_project (struct projectData *);
 extern "C" int load_project_file(const char*, projectData*, const char*);
 extern "C" void print_project (struct projectData *, struct projectData *, const char *);
@@ -105,7 +109,7 @@ void help () {
    PetscPrintf(PETSC_COMM_WORLD,"       -h          : Print this help text\n");
    PetscPrintf(PETSC_COMM_WORLD,"       filename    : Filename of an OpenParEM setup file.\n");
    PetscPrintf(PETSC_COMM_WORLD,"\nOpenParEM3D is a full-wave 3D electromagnetic solver.\n");
-   PetscPrintf(PETSC_COMM_WORLD,"Version 2.0.\n");
+   PetscPrintf(PETSC_COMM_WORLD,"Version %d.%d.%d\n",version_major,version_minor,version_patch);
 }
 
 bool print_mesh_quality_message (ParMesh *pmesh, struct projectData *projData)
@@ -250,7 +254,7 @@ int main(int argc, char *argv[])
    }
    if (printHelp) {help(); PetscFinalize(); exit(1);}
    
-   print_copyright_notice ("OpenParEM3D");
+   print_copyright_notice ("OpenParEM3D",version_major,version_minor,version_patch);
    char *baseName=get_project_name(projFile);
    char *lockfile=create_lock_file(baseName);
    isOpenParEM2Dreachable();
@@ -262,6 +266,9 @@ int main(int argc, char *argv[])
 
    // project
    load_project_file(projFile,&defaultData,&projData,lockfile,job_start_time);
+   projData.version_major=version_major;
+   projData.version_minor=version_minor;
+   projData.version_patch=version_patch;
    if (projData.output_show_license) {print_license(); exit_job_on_error (job_start_time,lockfile,true);}
    show_memory (projData.debug_show_memory, "   ");
 

@@ -53,6 +53,10 @@
 using namespace std;
 using namespace mfem;
 
+int version_major=2;
+int version_minor=1;
+int version_patch=0;
+
 extern "C" int eigensolve (struct projectData *, int, double, int, PetscInt *, int, PetscInt *, double **, double **, int *, PetscMPIInt);
 extern "C" void init_project (struct projectData *);
 extern "C" int load_project_file(const char*, projectData*, const char*);
@@ -71,7 +75,7 @@ void help () {
    PetscPrintf(PETSC_COMM_WORLD,"       -h          : Print this help text\n");
    PetscPrintf(PETSC_COMM_WORLD,"       filename    : Filename of an OpenParEM setup file.\n");
    PetscPrintf(PETSC_COMM_WORLD,"\nOpenParEM2D is a full-wave 2D electromagnetic solver.\n");
-   PetscPrintf(PETSC_COMM_WORLD,"Version 2.0.\n");
+   PetscPrintf(PETSC_COMM_WORLD,"Version %d.%d.%d\n",version_major,version_minor,version_patch);
 }
 
 // load the mesh - either serial or parallel
@@ -337,7 +341,7 @@ int main(int argc, char *argv[])
    if (printHelp) {help(); /*PetscFinalize()*/ SlepcFinalize();; exit(1);}
 
    char *baseName=get_project_name(projFile);
-   print_copyright_notice ("OpenParEM2D");
+   print_copyright_notice ("OpenParEM2D",version_major,version_minor,version_patch);
    char *lockfile=create_lock_file(baseName);
 
    appCtx.job_start_time=job_start_time;
@@ -348,6 +352,9 @@ int main(int argc, char *argv[])
 
    // project
    load_project_file(projFile,&defaultData,&projData,lockfile,job_start_time);
+   projData.version_major=version_major;
+   projData.version_minor=version_minor;
+   projData.version_patch=version_patch;
    delete_stale_files(baseName);
    char *tempdir=create_temp_directory(&projData,job_start_time,lockfile);
    if (projData.output_show_license) {print_license(); exit_job_on_error (job_start_time,lockfile,true);}
@@ -631,7 +638,7 @@ int main(int argc, char *argv[])
          resultDatabase.update_convergence(frequency,convergenceDatabase->is_converged(),convergenceDatabase->get_last_error());
 
          // save the results to a results csv file
-         if (rank == 0) resultDatabase.save(baseName);
+         if (rank == 0) resultDatabase.save(&projData,baseName);
 
          // initial guess
          if (projData.solution_use_initial_guess) use_initial_guess=1;
@@ -656,7 +663,7 @@ int main(int argc, char *argv[])
    // save the results and field point data as test cases
    if (projData.test_create_cases && rank == 0) {
       fieldPointDatabase.normalize();
-      fieldPointDatabase.save(baseName);
+      fieldPointDatabase.save(&projData,baseName);
 
       resultDatabase.save_as_test(baseName,projData.project_name);
       fieldPointDatabase.save_as_test(baseName,projData.project_name);

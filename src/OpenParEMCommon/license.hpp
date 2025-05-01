@@ -29,7 +29,7 @@ using namespace std;
 
 extern "C" void prefix ();
 
-void print_copyright_notice (string);
+void print_copyright_notice (string, int, int, int);
 void print_license ();
 
 #endif

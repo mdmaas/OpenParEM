@@ -20,9 +20,9 @@
 
 #include "license.hpp"
 
-void print_copyright_notice (string program_name)
+void print_copyright_notice (string program_name, int major, int minor, int patch)
 {
-   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s Copyright (C) 2025 Brian Young\n",program_name.c_str());
+   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s %d.%d.%d Copyright (C) 2025 Brian Young\n",program_name.c_str(),major,minor,patch);
    prefix(); PetscPrintf(PETSC_COMM_WORLD,"\n");
    prefix(); PetscPrintf(PETSC_COMM_WORLD,"This program comes with ABSOLUTELY NO WARRANTY.  This is free software,\n");
    prefix(); PetscPrintf(PETSC_COMM_WORLD,"and you are welcome to distribute it under certain conditions. To see\n");

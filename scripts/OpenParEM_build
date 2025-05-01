@@ -4,6 +4,9 @@
 # downloaded packages included with this distribution
 #----------------------------------------------------
 
+# local gcc compile version for portable pre-compiled binaries
+gcc_version="gcc-13.3.0"
+
 # flex, bison, and Open MPI are not typically installed on Linux systems.  To avoid
 # having to install them with root priviledges, they are compiled here.
 
@@ -224,6 +227,8 @@ print_help=0
 retval=0
 show_setup=0
 clean_in_place=0
+precompiled_bin=0
+
 cd ..
 install_path=$PWD
 cd "$scripts_dir"
@@ -280,6 +285,9 @@ for arg in "$@"; do
       elif [ "$arg" = "--show-setup" ]; then
          show_setup=1
       elif [ "$arg" = "--clean-in-place" ]; then
+         clean_in_place=1
+      elif [ "$arg" = "--precompiled-bin" ]; then
+         precompiled_bin=1
          clean_in_place=1
       elif [ "$arg" = "--with-m4" ]; then
          with_m4=1
@@ -411,7 +419,7 @@ if [ $print_help -eq 1 ]; then
    echo ""
    echo "After compiling, tests are performed on OpenParEM2D and OpenParEM3D.  If these pass,"
    echo "then compilation is successful and OpenParEM is ready to use.  However, it is still required"
-   echo "to set the PATH and the environment variable for OMP_NUM_THREADS=1."
+   echo "to set the PATH."
    echo ""
    echo "common OPTIONS:"
    echo "  --help or -H             print this help message and exit"
@@ -452,6 +460,9 @@ if [ $print_help -eq 1 ]; then
    echo "  --without-mfem           skip compiling libmfem"
    echo "  --with-OpenParEM         compile OpenParEM"
    echo "  --without-OpenParEM      skip compiling OpenParEM"
+   echo ""
+   echo "developer OPTIONS:"
+   echo "  --precompiled-bin        compile for a portable pre-compiled binary using a locally compiled version of gcc; forces --clean-in-place"
    exit $retval
 fi
 
@@ -460,18 +471,10 @@ echo "# OpenParEM_build: setup"
 echo "#------------------------------------------------------------------------------------"
 
 export PATH="$install_path/bin:$scripts_dir:$PATH"
-export OMP_NUM_THREADS=1
-
-# unset these environment variables because they can cause compilation failure 
-# if set to the wrong locations
-unset OPAL_PREFIX
-unset PMIX_PREFIX
-unset LD_LIBRARY_PATH
 
 echo "scripts_dir=$scripts_dir"
 echo "install_path=$install_path"
 echo "PATH=$PATH"
-echo "OMP_NUM_THREADS=$OMP_NUM_THREADS"
 echo "jobs=$jobs"
 
 # show the setup
@@ -649,6 +652,17 @@ cp field_plot.py "$HOME/.config/ParaView/Macros"
 cd "$scripts_dir"
 
 #----------------------------------------------------
+# clean in place
+#----------------------------------------------------
+
+if [ "$clean_in_place" = "1" ]; then
+   cd ..
+   echo "rm -Rf bin etc include lib lib64 man sbin share"
+   rm -Rf bin etc include lib lib64 man sbin share
+   cd "$scripts_dir"
+fi
+
+#----------------------------------------------------
 # check for missing sources
 #----------------------------------------------------
 
@@ -820,10 +834,34 @@ fi
 # builds
 #----------------------------------------------------
 
+echo "#------------------------------------------------------------------------------------"
+echo "# OpenParEM_build: build prep (if any)"
+echo "#------------------------------------------------------------------------------------"
+
 cd ..
 
-if [ "$clean_in_place" = "1" ]; then
-   rm -Rf bin etc include lib man sbin share
+if [ "$precompiled_bin" = "1" ]; then
+   echo "using local gcc build $gcc_version"
+
+   cd ../"$gcc_version"
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: failed to change to local gcc installation"
+      exit 1
+   fi
+
+   make install
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: failed to install the local gcc installation"
+      exit 1
+   fi
+
+   echo "export LD_PRELOAD=$install_path/lib64/libgfortran.so.5:$install_path/lib64/libquadmath.so.0:$install_path/lib64/libstdc++.so.6:$install_path/lib64/libgcc_s.so.1"
+   export LD_PRELOAD=$install_path/lib64/libgfortran.so.5:$install_path/lib64/libquadmath.so.0:$install_path/lib64/libstdc++.so.6:$install_path/lib64/libgcc_s.so.1
+
+   # Note that libc and libm are part of the operating system installation.  If the versions
+   # on the target system are too old, then a run-time error will occur.
+
+   cd ../OpenParEM
 fi
 
 # m4
@@ -1138,7 +1176,47 @@ if [ "$with_openmpi" = "1" ]; then
    cd ..
    remove_base_directory
    cd ..
+
 fi
+
+echo "#------------------------------------------------------------------------------------"
+echo "# OpenParEM_build: modifying mpirun to include environment variables"
+echo "#------------------------------------------------------------------------------------"
+
+cd bin
+   rm -f mpirun
+
+   echo "#!/bin/sh" > mpirun
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: failed to create mpirun file"
+      exit 1
+   fi
+
+   echo "export OMP_NUM_THREADS=1" >> mpirun
+
+   if [ "$precompiled_bin" = "1" ]; then
+
+      ORTERUN=$(which orterun)
+      if [ "$ORTERUN" = "" ]; then
+         echo "ERROR: mpirun failed to locate orterun."
+         exit 1
+      fi
+
+      OPEM=${ORTERUN%/bin/orterun}
+
+      echo "export OPAL_PREFIX=$OPEM" >> mpirun
+      echo "export PMIX_PREFIX=$OPEM" >> mpirun
+      echo "export LD_LIBRARY_PATH=$OPEM/lib:$OPEM/lib64:$LD_LIBRARY_PATH" >> mpirun
+   fi
+
+   echo 'orterun "$@"' >> mpirun
+
+   chmod u+x mpirun
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: openmpi failed to make mpirun executable"
+      exit 1
+   fi
+cd ..
 
 # hypre
 if [ "$with_hypre" = "1" ]; then
