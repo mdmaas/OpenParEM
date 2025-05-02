@@ -153,7 +153,11 @@ In summary, with a modal setup, the user provides integration paths for voltages
 \section{Files}
 \label{sec:files}
 
-OpenParEM2D is a command-line tool that takes one and only one input, and that is a text project control file.  To run OpenParEM2D, the command is
+OpenParEM2D is a command-line tool that takes one and only one input, and that is a text project control file.  To run serially on a single core or processor, the command is
+\begin{Verbatim}[fontsize=\small]
+   $ OpenParEM2D project_name.proj
+\end{Verbatim}
+and in parallel it is
 \begin{Verbatim}[fontsize=\small]
    $ mpirun -q --oversubscribe -np N OpenParEM2D project_name.proj
 \end{Verbatim}
@@ -481,6 +485,10 @@ $ cd rectangular_waveguide
 
 \item Run OpenParEM2D at the command line with
 \begin{Verbatim}[fontsize=\small]
+   $ OpenParEM2D rectangular_waveguide.proj
+\end{Verbatim}
+to run serially with a single core or with
+\begin{Verbatim}[fontsize=\small]
    $ mpirun -q --oversubscribe -np 4 OpenParEM2D rectangular_waveguide.proj
 \end{Verbatim}
 to run in parallel with 4 cores.  Substitute a larger or smaller core number as needed.  The option \verb+--oversubscribe+ is not needed if the number of cores is less than or equal to half the number of available cores.
@@ -649,6 +657,10 @@ $ cd coaxial_waveguide
 \noindent Note that iterative refinement is not needed for this problem since the mesh is fairly dense, 3$^{\textnormal{rd}}$-order finite elements are used, and the fields vary slowly.  See Appendix~\ref{sec:control_file_spec} for a complete list of available keyword/value pairs that can be included in the project control file.
 
 \item Run OpenParEM2D at the command line with
+\begin{Verbatim}[fontsize=\small]
+   $ OpenParEM2D coaxial_waveguide.proj
+\end{Verbatim}
+to run serially with a single core or with
 \begin{Verbatim}[fontsize=\small]
    $ mpirun -q --oversubscribe -np 4 OpenParEM2D coaxial_waveguide.proj
 \end{Verbatim}

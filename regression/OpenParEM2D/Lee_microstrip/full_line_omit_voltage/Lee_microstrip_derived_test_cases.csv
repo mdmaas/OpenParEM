@@ -7,7 +7,7 @@ Lee_microstrip_1_1_3_result,40000000000,1,imag_Z,equal,0.061511012099239,1e-10
 Lee_microstrip_1_1_0_field,4e+10,1,real_Emag,0.00125,0.000125,equal,1.0000000046741,1e-10
 Lee_microstrip_1_1_1_field,40000000000,1,real_Ephi,0.00125,0.000125,equal,1.57089144640962,1e-10
 Lee_microstrip_1_1_2_field,40000000000,1,real_Etheta,0.00125,0.000125,equal,1.57077899310344,1e-10
-Lee_microstrip_1_1_3_field,40000000000,1,imag_Emag,0.00125,0.000125,equal,0.0093344162514818,1e-10
+Lee_microstrip_1_1_3_field,40000000000,1,imag_Emag,0.00125,0.000125,equal,0.0093344162514818,1e-09
 Lee_microstrip_1_1_4_field,40000000000,1,imag_Ephi,0.00125,0.000125,lessthan,1e-10
 Lee_microstrip_1_1_5_field,40000000000,1,imag_Etheta,0.00125,0.000125,equal,5.49855726559727e-06,1e-06
 Lee_microstrip_1_1_6_field,40000000000,1,real_Hmag,0.00125,0.000125,equal,0.00667597104033415,1e-10

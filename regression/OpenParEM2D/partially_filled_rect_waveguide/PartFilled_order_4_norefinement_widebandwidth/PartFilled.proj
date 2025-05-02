@@ -4,7 +4,7 @@ project.save.fields               false
 
 mesh.file                         ../partially_filled_waveguide.msh
 mesh.order                        4
-mesh.uniform_refinement.count     0
+mesh.uniform_refinement.count     1
 
 mode.definition.file                    
 
@@ -25,9 +25,9 @@ frequency.plan.linear             6e9,15e9,1e9
 
 solution.modes                    5
 solution.temperature              20
-solution.tolerance                1e-10
+solution.tolerance                1e-11
 solution.iteration.limit          30000
-solution.modes.buffer             5
+solution.modes.buffer             10
 solution.impedance.definition     none
 solution.impedance.calculation    modal
 solution.accurate.residual        false

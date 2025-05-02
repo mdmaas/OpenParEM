@@ -69,7 +69,7 @@ $ ln -s OpenParEM_version OpenParEM
 $ cd OpenParEM
 $ more INSTALL
          \end{Verbatim}
-   \item Set the PATH to include the bin and scripts directories.  See the INSTALL file for details.
+   \item Set the PATH environment variable.  See the INSTALL file for details.
    \item Install Python scripts for FreeCAD and ParaView:
          \begin{Verbatim}
 $ cd scripts
@@ -80,7 +80,7 @@ $ OpenParEM_build --without-all
          \begin{Verbatim}
 $ OpenParEM_test
          \end{Verbatim}
-   \item Installation is complete if both tests report \texttt{pass}
+   \item Installation is complete if both tests report \texttt{pass}.
 \end{itemize}
 
 \section{Compiling from Source}
@@ -106,8 +106,8 @@ $ cd scripts
 $ ./OpenParEM_build --jobs=4 --with-all
          \end{Verbatim}
    \item On successful compilation, OpenParEM2D and OpenParEM3D are tested.  If both tests report \texttt{pass}, then compilation is complete.
-   \item Set PATH to include the bin and scripts directories.  See the INSTALL file for details.
-   \item Verify that paths and environment variables have been properly set by re-running the tests:
+   \item Set the PATH environment variable.  See the INSTALL file for details.
+   \item Verify that PATH has been properly set by re-running the tests:
          \begin{Verbatim}
 $ OpenParEM_test
          \end{Verbatim}
@@ -116,7 +116,7 @@ $ OpenParEM_test
 
 \section{Flow Tools}
 
-OpenParEM is a command-line tool for running electroagnetic simulations only.  Pre- and post-processing must be handled by other tools.
+OpenParEM is a command-line tool for running electromagnetic simulations only.  Pre- and post-processing must be handled by other tools.
 
 \subsection{FreeCAD}
 \label{sec:freecad}
@@ -263,13 +263,19 @@ The program tline3 is a custom solver for the cascade of three transmission line
 
 \section{Execution}
 
-OpenParEM2D and OpenParEM3D are command-line tools executed with the following commands
+OpenParEM2D and OpenParEM3D are command-line tools executed with the following commands when parallel processing
 \begin{verbatim}
    $ mpirun -q --oversubscribe -np N OpenParEM2D my_project.proj 
    $ mpirun -q --oversubscribe -np N OpenParEM3D my_project.proj 
 \end{verbatim}
+and 
+\begin{verbatim}
+   $ OpenParEM2D my_project.proj
+   $ OpenParEM3D my_project.proj
+\end{verbatim}
+when running in serial on a single core.  Running on a single core is sometimes convenient when getting a new project up-and-running.
 
-The \verb+-np+ option specifies the number of cores to use for the simulation, given by \verb+N+.  The \verb+-q+ option suppresses messages from the MPI infrastructure, which are rarely needed.  The \verb+--oversubscribe+ is required with OpenParEM3D when \verb+N+ is more than half the number of available cores.  
+When parallel processing, the \verb+-np+ option specifies the number of cores to use for the simulation, given by \verb+N+.  The \verb+-q+ option suppresses messages from the MPI infrastructure, which are rarely needed.  The \verb+--oversubscribe+ is required with OpenParEM3D when \verb+N+ is more than half the number of available cores.  
 
 The number of cores to specify, \verb+N+, requires some consideration.  If the simulations are being spread across multiple computers, it is assumed that the user knows about MPI processing considerations and no further comments are provided.  For simulations on a single computer, \verb+N+ should always be set to equal to or less than the number of physical cores.  For high-performance computing, there is not sufficient left-over capacity for threads to be utilized.  Depending on the computer, setting \verb+N+ to the number of physical cores can (and probably will) run slower than if \verb+N+ is set to a lower number.  The reason is that the available bandwidth on the CPU itself and to/from memory becomes saturated, so adding more cores causes MPI messages to be delayed due to limited bandwidth, slowing overall performance.  Experimenting with the value of \verb+N+ can identify the value that produces the fastest run times for a given computer.  Different computers have different optimal values of \verb+N+.  See Sec.~\ref{sec:computer} for additional discussion.
 

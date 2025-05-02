@@ -216,6 +216,64 @@ remove_base_directory() {
    fi
 }
 
+wrap_executable() {
+
+   echo "wrapping $1"
+
+   PROG=$1
+   BINPROG=$PROG.bin
+
+   IS_PRECOMPILED=$2
+
+   cd ../bin
+
+      if [ $? -ne 0 ]; then
+         echo "ERROR: failed to change to the bin directory"
+         exit 1
+      fi
+
+      mv $PROG $BINPROG
+      if [ $? -ne 0 ]; then
+         echo "ERROR: failed to move $PROG to $BINPROG"
+         exit 1
+      fi
+
+      echo '#!/bin/sh' > $PROG
+      if [ $? -ne 0 ]; then
+         echo "ERROR: failed to create $PROG"
+         exit 1
+      fi
+
+      echo '' >> $PROG
+      echo "BINPROG=$BINPROG" >> $PROG
+      if [ "$IS_PRECOMPILED" = "1" ]; then
+         echo 'BINPATH=$(which $BINPROG)' >> $PROG
+         echo 'if [ "$BINPATH" = "" ]; then' >> $PROG
+         echo '   echo "ERROR: Failed to locate $BINPROG."' >> $PROG
+         echo '   exit 1' >> $PROG
+         echo 'fi' >> $PROG
+
+         echo 'OPEM=${BINPATH%/bin/$BINPROG}' >> $PROG
+
+         echo '' >> $PROG
+         echo 'export LD_LIBRARY_PATH=$OPEM/lib:$OPEM/lib64:$LD_LIBRARY_PATH' >> $PROG
+         echo 'export OPAL_PREFIX=$OPEM' >> $PROG
+         echo 'export PMIX_PREFIX=$OPEM' >> $PROG
+      fi 
+      echo 'export OMP_NUM_THREADS=1' >> $PROG
+
+      echo '' >> $PROG
+      echo '$BINPROG "$@"' >> $PROG
+
+      chmod u+x $PROG
+      if [ $? -ne 0 ]; then
+         echo "ERROR: failed make $PROG executable"
+         exit 1
+      fi
+
+   cd ../scripts
+}
+
 #----------------------------------------------------
 # variables
 #----------------------------------------------------
@@ -1179,45 +1237,6 @@ if [ "$with_openmpi" = "1" ]; then
 
 fi
 
-echo "#------------------------------------------------------------------------------------"
-echo "# OpenParEM_build: modifying mpirun to include environment variables"
-echo "#------------------------------------------------------------------------------------"
-
-cd bin
-   rm -f mpirun
-
-   echo "#!/bin/sh" > mpirun
-   if [ $? -ne 0 ]; then
-      echo "OpenParEM_ERROR: failed to create mpirun file"
-      exit 1
-   fi
-
-   echo "export OMP_NUM_THREADS=1" >> mpirun
-
-   if [ "$precompiled_bin" = "1" ]; then
-
-      ORTERUN=$(which orterun)
-      if [ "$ORTERUN" = "" ]; then
-         echo "ERROR: mpirun failed to locate orterun."
-         exit 1
-      fi
-
-      OPEM=${ORTERUN%/bin/orterun}
-
-      echo "export OPAL_PREFIX=$OPEM" >> mpirun
-      echo "export PMIX_PREFIX=$OPEM" >> mpirun
-      echo "export LD_LIBRARY_PATH=$OPEM/lib:$OPEM/lib64:$LD_LIBRARY_PATH" >> mpirun
-   fi
-
-   echo 'orterun "$@"' >> mpirun
-
-   chmod u+x mpirun
-   if [ $? -ne 0 ]; then
-      echo "OpenParEM_ERROR: openmpi failed to make mpirun executable"
-      exit 1
-   fi
-cd ..
-
 # hypre
 if [ "$with_hypre" = "1" ]; then
 
@@ -1387,6 +1406,24 @@ if [ "$with_OpenParEM" = "1" ]; then
 fi
 
 cd scripts
+
+echo "#------------------------------------------------------------------------------------"
+echo "# OpenParEM_build: creating wrappers for executables"
+echo "#------------------------------------------------------------------------------------"
+
+if [ "$with_OpenParEM" = "1" ]; then
+   wrap_executable builder $precompiled_bin
+   wrap_executable OpenParEM2D $precompiled_bin
+   wrap_executable process2D $precompiled_bin
+   wrap_executable simplify2D $precompiled_bin
+   wrap_executable OpenParEM3D $precompiled_bin
+   wrap_executable process3D $precompiled_bin
+   wrap_executable simplify3D $precompiled_bin
+fi
+
+if [ "$with_openmpi" = "1" ]; then
+   wrap_executable orterun $precompiled_bin
+fi
 
 # finish up with elapsed time
 end_time="$(date -u +%s)"

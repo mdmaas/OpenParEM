@@ -3,8 +3,12 @@ Installing OpenParEM using the package with pre-compiled binaries
 ----------------------------------------------------------------------------------
 
 The pre-compiled binary allows OpenParEM to be run on x86 Linux platforms without
-installing any additional packages.  Execution with the pre-compiled binary is
-verified for the following operating systems:
+installing any additional packages. The installation process is to download and 
+unpack the binary distribution, set the PATH environment variable, then run the 
+test script to ensure successful operation.
+
+Execution with the pre-compiled binary is verified for the following operating
+systems:
 
 Ubuntu 22.04 LTS
 Ubuntu 24.04 LTS
@@ -16,8 +20,10 @@ Amazon 2023 AMI
 The binary fails to run on the following systems:
 Suse SLES 12-SP5 - The GLIBC binary in the Suse system is too old.
 
+Detailed instructions:
 
-1. Download the installation package OpenParEM_bin_version.tar.gz.
+1. Download the installation package OpenParEM_bin_version.tar.gz from
+   https://openparem.org.
 2. Copy the installation package to an installation directory "install_dir".
 3. cd to install_dir and unpack the installation directory using the commands:
 
@@ -25,7 +31,7 @@ Suse SLES 12-SP5 - The GLIBC binary in the Suse system is too old.
    $ ln -s OpenParEM_version OpenParEM
 
    Setting the link enables new revisions to be installed without having to
-   modifiy the paths in the shell configuration file (steps 4-6).
+   modifiy the PATH environment variable in the shell configuration file.
 
 4. In directory $HOME, edit the configuration file for the shell used for
    command line processing.
@@ -72,6 +78,10 @@ OpenParEM if the necessary build tools are installed or can be installed on the
 system.  To simplify the build process, a build script is provided that includes
 all dependencies so that a single command builds and tests the compiled binary.
 
+The installation process is to download and unpack the binary distribution,
+install any missing compilation tools, run the compilation script, update the PATH
+environment variable, then run the test script to ensure successful operation.
+
 Compilation is verified for the following x86 Linux operating systems:
 
 Ubuntu 22.04.5 LTS
@@ -83,7 +93,7 @@ Amazon 2023 AMI
 Compililation fails for the following operating systems:
 
 Suse SLES 15-SP6 - fails during compilation of the MFEM library with a
-                   segmentation fault by reported by mpicxx
+                   segmentation fault reported by mpicxx
 Suse SLES 12-SP5 - fails during configuration of Petsc for fortran bindings
 
 
@@ -129,7 +139,8 @@ Note that installing packages requires system-level installation priviledges.
 Compilation and Installation 
 ---------------------------
 
-1. Download the installation package OpenParEM-version.tar.gz.
+1. Download the installation package OpenParEM-version.tar.gz from
+   https://openparem.org.
 2. Copy the installation package to a src directory "src_dir"
 3. cd to src_dir and unpack the src tree using the commands:
 
@@ -137,7 +148,7 @@ Compilation and Installation
    $ ln -s OpenParEM-version OpenParEM
 
    Setting the link enables new revisions to be installed without having to
-   modifiy the paths in the shell configuration file (steps 8 and 9).
+   modifiy the PATH environment variable in the shell configuration file.
 
 4. cd to OpenParEM/scripts.
 5. Compile and install in the src tree by running the script "OpenParEM_build".
@@ -155,8 +166,12 @@ Compilation and Installation
       $ ./OpenParEM_build --jobs=4 
 
       cmake, flex, bison, and Open MPI are not compiled and installed if they are
-      found on the system.  For Open MPI, the development package must be installed
-      in addition to the executable package.
+      found on the system.  For Open MPI, the development package must be
+      installed in addition to the executable package.
+
+   Compilation does not require administrator priviledges unless the --prefix
+   option below is specified with a location in an area where the user does not
+   have write priviledges.
 
    Some compiling issues are reported with a message "See 'config.log' for
    more details".  The config.log file is located in the directory where
@@ -175,7 +190,7 @@ Compilation and Installation
       exist before running the script.
 
 7. When compilation completes, OpenParEM2D and OpenParEM3D are tested. If
-   the two tests pass, then the basic installation is complete and just
+   the two tests pass, then the basic installation is complete and just the
    PATH environment variable needs to be set.
 
 8. In directory $HOME, edit the configuration file for the shell used for
@@ -208,5 +223,4 @@ Compilation and Installation
    $ OpenParEM_test
 
    If the two tests pass, then the installation is complete.
-
 
