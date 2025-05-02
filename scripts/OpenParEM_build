@@ -100,15 +100,11 @@ fi
 
 which flex > /dev/null 2>&1
 if [ $? -eq 0 ]; then
-   with_m4=0
    with_flex=0
 fi
 
 which mpirun > /dev/null 2>&1
 if [ $? -eq 0 ]; then
-   with_hwloc=0
-   with_libevent=0
-   with_pmix=0
    with_openmpi=0
 fi
 
@@ -223,7 +219,7 @@ wrap_executable() {
    PROG=$1
    BINPROG=$PROG.bin
 
-   IS_PRECOMPILED=$2
+   HAS_COMPILED_OPENMPI=$2
 
    cd ../bin
 
@@ -246,20 +242,20 @@ wrap_executable() {
 
       echo '' >> $PROG
       echo "BINPROG=$BINPROG" >> $PROG
-      if [ "$IS_PRECOMPILED" = "1" ]; then
-         echo 'BINPATH=$(which $BINPROG)' >> $PROG
-         echo 'if [ "$BINPATH" = "" ]; then' >> $PROG
-         echo '   echo "ERROR: Failed to locate $BINPROG."' >> $PROG
-         echo '   exit 1' >> $PROG
-         echo 'fi' >> $PROG
+      echo 'BINPATH=$(which $BINPROG)' >> $PROG
+      echo 'if [ "$BINPATH" = "" ]; then' >> $PROG
+      echo '   echo "ERROR: Failed to locate $BINPROG."' >> $PROG
+      echo '   exit 1' >> $PROG
+      echo 'fi' >> $PROG
 
-         echo 'OPEM=${BINPATH%/bin/$BINPROG}' >> $PROG
+      echo 'OPEM=${BINPATH%/bin/$BINPROG}' >> $PROG
 
-         echo '' >> $PROG
-         echo 'export LD_LIBRARY_PATH=$OPEM/lib:$OPEM/lib64:$LD_LIBRARY_PATH' >> $PROG
+      echo '' >> $PROG
+      echo 'export LD_LIBRARY_PATH=$OPEM/lib:$OPEM/lib64:$LD_LIBRARY_PATH' >> $PROG
+      if [ "$HAS_COMPILED_OPENMPI" = "1" ]; then
          echo 'export OPAL_PREFIX=$OPEM' >> $PROG
          echo 'export PMIX_PREFIX=$OPEM' >> $PROG
-      fi 
+      fi
       echo 'export OMP_NUM_THREADS=1' >> $PROG
 
       echo '' >> $PROG
@@ -529,6 +525,7 @@ echo "# OpenParEM_build: setup"
 echo "#------------------------------------------------------------------------------------"
 
 export PATH="$install_path/bin:$scripts_dir:$PATH"
+export LD_LIBRARY_PATH=$install_path/lib:$install_path/lib64:$LD_LIBRARY_PATH
 
 echo "scripts_dir=$scripts_dir"
 echo "install_path=$install_path"
@@ -912,9 +909,6 @@ if [ "$precompiled_bin" = "1" ]; then
       echo "OpenParEM_ERROR: failed to install the local gcc installation"
       exit 1
    fi
-
-   echo "export LD_PRELOAD=$install_path/lib64/libgfortran.so.5:$install_path/lib64/libquadmath.so.0:$install_path/lib64/libstdc++.so.6:$install_path/lib64/libgcc_s.so.1"
-   export LD_PRELOAD=$install_path/lib64/libgfortran.so.5:$install_path/lib64/libquadmath.so.0:$install_path/lib64/libstdc++.so.6:$install_path/lib64/libgcc_s.so.1
 
    # Note that libc and libm are part of the operating system installation.  If the versions
    # on the target system are too old, then a run-time error will occur.
@@ -1347,7 +1341,17 @@ if [ "$with_mfem" = "1" ]; then
       exit 1
    fi
 
-   make parallel -j "$jobs" MFEM_USE_METIS_5=YES
+   ENABLE_STATIC=NO
+   if [ "$enable_static" = "yes" ]; then
+      ENABLE_STATIC=YES
+   fi
+
+   ENABLE_SHARED=NO
+   if [ "$enable_shared" = "yes" ]; then
+      ENABLE_SHARED=YES
+   fi
+
+   make parallel -j "$jobs" MFEM_USE_METIS_5=YES HYPRE_DIR=$install_path SHARED=$ENABLE_SHARED STATIC=$ENABLE_STATIC
    if [ $? -ne 0 ]; then
       echo "OpenParEM_ERROR: mfem failed to make"
       exit 1
@@ -1411,18 +1415,62 @@ echo "#-------------------------------------------------------------------------
 echo "# OpenParEM_build: creating wrappers for executables"
 echo "#------------------------------------------------------------------------------------"
 
+# see if a compiled version of Open MPI exists
+cd ../bin
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: failed to change to bin directory."
+      exit 1
+   fi
+
+   HAS_ORTERUN=0
+   if [ -f orterun ]; then
+      HAS_ORTERUN=1
+   fi
+
+   HAS_ORTERUNBIN=0
+   if [ -f orterun.bin ]; then
+      HAS_ORTERUNBIN=1
+   fi
+
+cd ../scripts
+
+
 if [ "$with_OpenParEM" = "1" ]; then
-   wrap_executable builder $precompiled_bin
-   wrap_executable OpenParEM2D $precompiled_bin
-   wrap_executable process2D $precompiled_bin
-   wrap_executable simplify2D $precompiled_bin
-   wrap_executable OpenParEM3D $precompiled_bin
-   wrap_executable process3D $precompiled_bin
-   wrap_executable simplify3D $precompiled_bin
+   wrap_executable builder $HAS_ORTERUN
+   wrap_executable OpenParEM2D $HAS_ORTERUN
+   wrap_executable process2D $HAS_ORTERUN
+   wrap_executable simplify2D $HAS_ORTERUN
+   wrap_executable OpenParEM3D $HAS_ORTERUN
+   wrap_executable process3D $HAS_ORTERUN
+   wrap_executable simplify3D $HAS_ORTERUN
 fi
 
-if [ "$with_openmpi" = "1" ]; then
-   wrap_executable orterun $precompiled_bin
+if [ "$HAS_ORTERUN" = "1" ]; then
+   if [ "$HAS_ORTERUNBIN" = "0" ]; then
+      wrap_executable orterun $HAS_ORTERUN
+   fi
+else
+   cd ../bin
+   if [ $? -ne 0 ]; then
+      echo "OpenParEM_ERROR: failed to change to bin directory."
+      exit 1
+   fi
+
+   if [ ! -f orterun ]; then
+
+      rm -f mpirun
+      echo "#!/bin/sh" > mpirun
+      if [ $? -ne 0 ]; then
+         echo "OpenParEM_ERROR: failed to create file mpirun."
+         exit 1
+      fi
+
+      echo 'export OMP_NUM_THREADS=1' >> mpirun
+      echo 'orterun "$@"' >> mpirun
+
+   fi
+
+   cd ../scripts
 fi
 
 # finish up with elapsed time
