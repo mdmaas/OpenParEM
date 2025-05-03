@@ -561,7 +561,7 @@ void init_project (struct projectData *data) {
    data->refinement_frequency=allocCopyString("highlow");
    data->refinement_iteration_min=1;
    data->refinement_iteration_max=10;
-   data->refinement_required_passes=3;
+   data->refinement_required_passes=1;
    data->refinement_relative_tolerance=0.02;
    data->refinement_absolute_tolerance=1e-6;
    data->refinement_variable=allocCopyString("SandH");  
@@ -696,13 +696,13 @@ void print_project (struct projectData *data, struct projectData *defaultData, c
    prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%smesh.save.refined %s\n",indent,comment[matched],logic[data->mesh_save_refined]);
 
    matched=0; if (defaultData && double_compare(data->mesh_3D_refinement_fraction,defaultData->mesh_3D_refinement_fraction,1e-14)) matched=1;
-   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%smesh.refinement.fraction %g\n",indent,comment[matched],data->mesh_3D_refinement_fraction);
+   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%smesh.refinement.fraction %.15g\n",indent,comment[matched],data->mesh_3D_refinement_fraction);
 
    matched=0; if (defaultData && double_compare(data->mesh_quality_limit,defaultData->mesh_quality_limit,1e-14)) matched=1;
-   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%smesh.quality.limit %g\n",indent,comment[matched],data->mesh_quality_limit);
+   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%smesh.quality.limit %.15g\n",indent,comment[matched],data->mesh_quality_limit);
 
    matched=0; if (defaultData && strcmp(data->port_definition_file,defaultData->port_definition_file) == 0) matched=1;
-   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%smode.definition.file %s\n",indent,comment[matched],data->port_definition_file);
+   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%sport.definition.file %s\n",indent,comment[matched],data->port_definition_file);
 
    matched=0; if (defaultData && strcmp(data->refinement_frequency,defaultData->refinement_frequency) == 0) matched=1;
    prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%srefinement.frequency %s\n",indent,comment[matched],data->refinement_frequency);
@@ -717,10 +717,10 @@ void print_project (struct projectData *data, struct projectData *defaultData, c
    prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%srefinement.required.passes %d\n",indent,comment[matched],data->refinement_required_passes);
 
    matched=0; if (defaultData && double_compare(data->refinement_relative_tolerance,defaultData->refinement_relative_tolerance,1e-14)) matched=1;
-   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%srefinement.relative.tolerance %g\n",indent,comment[matched],data->refinement_relative_tolerance);
+   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%srefinement.relative.tolerance %.15g\n",indent,comment[matched],data->refinement_relative_tolerance);
 
    matched=0; if (defaultData && double_compare(data->refinement_absolute_tolerance,defaultData->refinement_absolute_tolerance,1e-14)) matched=1;
-   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%srefinement.absolute.tolerance %g\n",indent,comment[matched],data->refinement_absolute_tolerance);
+   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%srefinement.absolute.tolerance %.15g\n",indent,comment[matched],data->refinement_absolute_tolerance);
 
    matched=0; if (defaultData && strcmp(data->refinement_variable,defaultData->refinement_variable) == 0) matched=1;
    prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%srefinement.variable %s\n",indent,comment[matched],data->refinement_variable);
@@ -748,32 +748,32 @@ void print_project (struct projectData *data, struct projectData *defaultData, c
    while (i < data->inputFrequencyPlansCount) {
       if (data->inputFrequencyPlans[i].type == 0) {
          if (data->inputFrequencyPlans[i].refine == 0) {
-            prefix(); PetscPrintf(PETSC_COMM_WORLD,"%sfrequency.plan.linear %g,%g,%g\n",indent,
+            prefix(); PetscPrintf(PETSC_COMM_WORLD,"%sfrequency.plan.linear %.15g,%.15g,%.15g\n",indent,
                         data->inputFrequencyPlans[i].start,data->inputFrequencyPlans[i].stop,data->inputFrequencyPlans[i].step);
          } else {
-            prefix(); PetscPrintf(PETSC_COMM_WORLD,"%sfrequency.plan.linear.refine %g,%g,%g\n",indent,
+            prefix(); PetscPrintf(PETSC_COMM_WORLD,"%sfrequency.plan.linear.refine %.15g,%.15g,%.15g\n",indent,
                         data->inputFrequencyPlans[i].start,data->inputFrequencyPlans[i].stop,data->inputFrequencyPlans[i].step);
          }
       } else if (data->inputFrequencyPlans[i].type == 1) {
          if (data->inputFrequencyPlans[i].refine == 0) {
-            prefix(); PetscPrintf(PETSC_COMM_WORLD,"%sfrequency.plan.log %g,%g,%d\n",indent,
+            prefix(); PetscPrintf(PETSC_COMM_WORLD,"%sfrequency.plan.log %.15g,%.15g,%d\n",indent,
                         data->inputFrequencyPlans[i].start,data->inputFrequencyPlans[i].stop,data->inputFrequencyPlans[i].pointsPerDecade);
          } else {
-            prefix(); PetscPrintf(PETSC_COMM_WORLD,"%sfrequency.plan.log.refine %g,%g,%d\n",indent,
+            prefix(); PetscPrintf(PETSC_COMM_WORLD,"%sfrequency.plan.log.refine %.15g,%.15g,%d\n",indent,
                         data->inputFrequencyPlans[i].start,data->inputFrequencyPlans[i].stop,data->inputFrequencyPlans[i].pointsPerDecade);
          }
       } else if (data->inputFrequencyPlans[i].type == 2) {
          if (data->inputFrequencyPlans[i].refine == 0) {
-            prefix(); PetscPrintf(PETSC_COMM_WORLD,"%sfrequency.plan.point %g\n",indent,data->inputFrequencyPlans[i].frequency);
+            prefix(); PetscPrintf(PETSC_COMM_WORLD,"%sfrequency.plan.point %.15g\n",indent,data->inputFrequencyPlans[i].frequency);
          } else {
-            prefix(); PetscPrintf(PETSC_COMM_WORLD,"%sfrequency.plan.point.refine %g\n",indent,data->inputFrequencyPlans[i].frequency);
+            prefix(); PetscPrintf(PETSC_COMM_WORLD,"%sfrequency.plan.point.refine %.15g\n",indent,data->inputFrequencyPlans[i].frequency);
          }
       }
       i++;
    }
 
    matched=0; if (defaultData && double_compare(data->reference_impedance,defaultData->reference_impedance,1e-14)) matched=1;
-   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%sreference.impedance %g\n",indent,comment[matched],data->reference_impedance);
+   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%sreference.impedance %.15g\n",indent,comment[matched],data->reference_impedance);
 
    matched=0; if (defaultData && strcmp(data->touchstone_frequency_unit,defaultData->touchstone_frequency_unit) == 0) matched=1;
    prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%stouchstone.frequency.unit %s\n",indent,comment[matched],data->touchstone_frequency_unit);
@@ -782,13 +782,13 @@ void print_project (struct projectData *data, struct projectData *defaultData, c
    prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%stouchstone.format %s\n",indent,comment[matched],data->touchstone_format);
 
    matched=0; if (defaultData && double_compare(data->solution_temperature,defaultData->solution_temperature,1e-14)) matched=1;
-   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%ssolution.temperature %g\n",indent,comment[matched],data->solution_temperature);
+   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%ssolution.temperature %.15g\n",indent,comment[matched],data->solution_temperature);
 
    matched=0; if (defaultData && double_compare(data->solution_2D_tolerance,defaultData->solution_2D_tolerance,1e-14)) matched=1;
-   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%ssolution.2D.tolerance %g\n",indent,comment[matched],data->solution_2D_tolerance);
+   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%ssolution.2D.tolerance %.15g\n",indent,comment[matched],data->solution_2D_tolerance);
 
    matched=0; if (defaultData && double_compare(data->solution_3D_tolerance,defaultData->solution_3D_tolerance,1e-14)) matched=1;
-   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%ssolution.3D.tolerance %g\n",indent,comment[matched],data->solution_3D_tolerance);
+   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%ssolution.3D.tolerance %.15g\n",indent,comment[matched],data->solution_3D_tolerance);
 
    matched=0; if (defaultData && data->solution_iteration_limit == defaultData->solution_iteration_limit) matched=1;
    prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%ssolution.iteration.limit %d\n",indent,comment[matched],data->solution_iteration_limit);
@@ -812,7 +812,7 @@ void print_project (struct projectData *data, struct projectData *defaultData, c
    prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%ssolution.use.initial.guess %s\n",indent,comment[matched],logic[data->solution_use_initial_guess]);
 
    matched=0; if (defaultData && double_compare(data->solution_shift_factor,defaultData->solution_shift_factor,1e-14)) matched=1;
-   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%ssolution.shift.factor %g\n",indent,comment[matched],data->solution_shift_factor);
+   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%ssolution.shift.factor %.15g\n",indent,comment[matched],data->solution_shift_factor);
 
    // no default antenna patterns, so print all
    i=0;
@@ -823,9 +823,9 @@ void print_project (struct projectData *data, struct projectData *defaultData, c
          else PetscPrintf(PETSC_COMM_WORLD,"%santenna.plot.2D.pattern %s",indent,data->inputAntennaPatterns[i].quantity1);
          if (data->inputAntennaPatterns[i].quantity2 != NULL) PetscPrintf(PETSC_COMM_WORLD,",%s",data->inputAntennaPatterns[i].quantity2);
          if (data->inputAntennaPatterns[i].plane != NULL) PetscPrintf(PETSC_COMM_WORLD,",%s",data->inputAntennaPatterns[i].plane);
-         else {PetscPrintf(PETSC_COMM_WORLD,",%g,%g",data->inputAntennaPatterns[i].theta,data->inputAntennaPatterns[i].phi);}
-         PetscPrintf(PETSC_COMM_WORLD,",%g",data->inputAntennaPatterns[i].latitude);
-         PetscPrintf(PETSC_COMM_WORLD,",%g",data->inputAntennaPatterns[i].rotation);
+         else {PetscPrintf(PETSC_COMM_WORLD,",%.15g,%.15g",data->inputAntennaPatterns[i].theta,data->inputAntennaPatterns[i].phi);}
+         PetscPrintf(PETSC_COMM_WORLD,",%.15g",data->inputAntennaPatterns[i].latitude);
+         PetscPrintf(PETSC_COMM_WORLD,",%.15g",data->inputAntennaPatterns[i].rotation);
          PetscPrintf(PETSC_COMM_WORLD,"\n");
       } else {
          prefix();
@@ -837,13 +837,13 @@ void print_project (struct projectData *data, struct projectData *defaultData, c
    }
 
    matched=0; if (defaultData && double_compare(data->antenna_plot_current_resolution,defaultData->antenna_plot_current_resolution,1e-14)) matched=1;
-   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%santenna.plot.current.resolution %g\n",indent,comment[matched],data->antenna_plot_current_resolution);
+   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%santenna.plot.current.resolution %.15g\n",indent,comment[matched],data->antenna_plot_current_resolution);
 
    matched=0; if (defaultData && double_compare(data->antenna_plot_2D_range,defaultData->antenna_plot_2D_range,1e-14)) matched=1;
-   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%santenna.plot.2D.range %g\n",indent,comment[matched],data->antenna_plot_2D_range);
+   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%santenna.plot.2D.range %.15g\n",indent,comment[matched],data->antenna_plot_2D_range);
 
    matched=0; if (defaultData && double_compare(data->antenna_plot_2D_resolution,defaultData->antenna_plot_2D_resolution,1e-14)) matched=1;
-   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%santenna.plot.2D.resolution %g\n",indent,comment[matched],data->antenna_plot_2D_resolution);
+   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%santenna.plot.2D.resolution %.15g\n",indent,comment[matched],data->antenna_plot_2D_resolution);
 
    matched=0;  if (defaultData && data->antenna_plot_2D_annotations == defaultData->antenna_plot_2D_annotations) matched=1;
    prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%santenna.plot.2D.annotations %s\n",indent,comment[matched],logic[data->antenna_plot_2D_annotations]);
@@ -855,7 +855,7 @@ void print_project (struct projectData *data, struct projectData *defaultData, c
    prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%santenna.plot.3D.refinement %d\n",indent,comment[matched],data->antenna_plot_3D_refinement);
 
    matched=0; if (defaultData && double_compare(data->antenna_plot_2D_interval,defaultData->antenna_plot_2D_interval,1e-14)) matched=1;
-   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%santenna.plot.2D.interval %g\n",indent,comment[matched],data->antenna_plot_2D_interval);
+   prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%santenna.plot.2D.interval %.15g\n",indent,comment[matched],data->antenna_plot_2D_interval);
 
    matched=0;  if (defaultData && data->antenna_plot_3D_sphere == defaultData->antenna_plot_3D_sphere) matched=1;
    prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%santenna.plot.3D.sphere %s\n",indent,comment[matched],logic[data->antenna_plot_3D_sphere]);
@@ -920,7 +920,7 @@ void print_project (struct projectData *data, struct projectData *defaultData, c
    // no default field points, so print all
    i=0;
    while (i < data->field_points_count) {
-      prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%sfield.point %g,%g,%g\n",indent,indent,data->field_points_x[i],data->field_points_y[i],data->field_points_z[i]);
+      prefix(); PetscPrintf(PETSC_COMM_WORLD,"%s%sfield.point %.15g,%.15g,%.15g\n",indent,indent,data->field_points_x[i],data->field_points_y[i],data->field_points_z[i]);
       i++;
    }
 
@@ -992,10 +992,10 @@ void print_antenna_patterns (struct projectData *data, PetscMPIInt rank_)
          printf ("   quantity1=%s\n",data->inputAntennaPatterns[i].quantity1);
          printf ("   quantity2=%s\n",data->inputAntennaPatterns[i].quantity2);
          printf ("   plane=%s\n",data->inputAntennaPatterns[i].plane);
-         printf ("   theta=%g\n",data->inputAntennaPatterns[i].theta);
-         printf ("   phi=%g\n",data->inputAntennaPatterns[i].phi);
-         printf ("   latitude=%g\n",data->inputAntennaPatterns[i].latitude);
-         printf ("   rotation=%g\n",data->inputAntennaPatterns[i].rotation);
+         printf ("   theta=%.15g\n",data->inputAntennaPatterns[i].theta);
+         printf ("   phi=%.15g\n",data->inputAntennaPatterns[i].phi);
+         printf ("   latitude=%.15g\n",data->inputAntennaPatterns[i].latitude);
+         printf ("   rotation=%.15g\n",data->inputAntennaPatterns[i].rotation);
          i++;
       }
    }
