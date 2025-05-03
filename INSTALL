@@ -22,13 +22,13 @@ Suse SLES 12-SP5 - The GLIBC binary in the Suse system is too old.
 
 Detailed instructions:
 
-1. Download the installation package OpenParEM_bin_version.tar.gz from
+1. Download the installation package OpenParEM-version-bin.tar.gz from
    https://openparem.org.
 2. Copy the installation package to an installation directory "install_dir".
 3. cd to install_dir and unpack the installation directory using the commands:
 
-   $ tar -xf OpenParEM_bin_version.tar.gz
-   $ ln -s OpenParEM_version OpenParEM
+   $ tar -xf OpenParEM-version-bin.tar.gz
+   $ ln -s OpenParEM-version OpenParEM
 
    Setting the link enables new revisions to be installed without having to
    modifiy the PATH environment variable in the shell configuration file.

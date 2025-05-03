@@ -1,5 +1,7 @@
 #!/bin/sh
 
+VERSION=2.1.0
+
 cd ../..
 
 remove_project_run_files() {
@@ -16,28 +18,35 @@ remove_project_run_files() {
 
 CURRENTDATE=`date +"%m-%d-%Y"`
 
-cd OpenParEM/src
+cd OpenParEM-${VERSION}/src
 make distclean
 cd ../..
 
-cd OpenParEM/regression
+cd OpenParEM-${VERSION}/regression
    remove_project_run_files
-   rm -Rf OpenParEM3D/WR90/straight-adaptive/refined_straight.msh
+   rm -Rf OpenParEM-${VERSION}3D/WR90/straight-adaptive/refined_straight.msh
 cd ../..
 
-cd OpenParEM/tutorials
+cd OpenParEM-${VERSION}/tutorials
    remove_project_run_files
 cd ../..
+
 
 # source code distribution - also a full backup with executables removed
-tar --exclude='.git' --exclude='OpenParEM/bin' --exclude='OpenParEM/etc' --exclude='OpenParEM/include' --exclude='OpenParEM/lib' --exclude='OpenParEM/lib64' --exclude='OpenParEM/sbin' --exclude='OpenParEM/share' --exclude='OpenParEM/libexec' -zcf OpenParEM_${CURRENTDATE}.tar.gz OpenParEM
+
+echo "Building OpenParEM-${VERSION}_${CURRENTDATE}.tar.gz"
+
+tar --exclude=".git" --exclude="OpenParEM-${VERSION}/bin" --exclude="OpenParEM-${VERSION}/etc" --exclude="OpenParEM-${VERSION}/include" --exclude="OpenParEM-${VERSION}/lib" --exclude="OpenParEM-${VERSION}/lib64" --exclude="OpenParEM-${VERSION}/sbin" --exclude="OpenParEM-${VERSION}/share" --exclude="OpenParEM-${VERSION}/libexec" -zcf OpenParEM-${VERSION}_${CURRENTDATE}.tar.gz OpenParEM-${VERSION}
+
+
 
 # binary distribution - without external packages, source code, and include files
-#tar --exclude='.git' --exclude='OpenParEM/external_packages' --exclude='OpenParEM/include' --exclude='OpenParEM/sbin' --exclude='OpenParEM/src' -zcf OpenParEM_bin_${CURRENTDATE}.tar.gz OpenParEM
 
-tar --exclude='.git' --exclude='OpenParEM/external_packages' --exclude='OpenParEM/include' --exclude='OpenParEM/bin' --exclude='OpenParEM/sbin' --exclude='OpenParEM/src' --exclude='OpenParEM/libexec' -cf OpenParEM_bin_${CURRENTDATE}.tar OpenParEM
+echo "Building OpenParEM-${VERSION}-bin_${CURRENTDATE}.tar.gz"
 
-tar -rf OpenParEM_bin_${CURRENTDATE}.tar OpenParEM/bin/OpenParEM2D OpenParEM/bin/OpenParEM3D OpenParEM/bin/process2D OpenParEM/bin/process3D OpenParEM/bin/simplify2D OpenParEM/bin/simplify3D OpenParEM/bin/builder OpenParEM/bin/mpirun OpenParEM/bin/ort*
+tar --exclude=".git" --exclude="OpenParEM-${VERSION}/external_packages" --exclude="OpenParEM-${VERSION}/include" --exclude="OpenParEM-${VERSION}/bin" --exclude="OpenParEM-${VERSION}/sbin" --exclude="OpenParEM-${VERSION}/src" --exclude="OpenParEM-${VERSION}/libexec" -cf OpenParEM-${VERSION}-bin_${CURRENTDATE}.tar OpenParEM-${VERSION}
 
-gzip OpenParEM_bin_${CURRENTDATE}.tar
+tar -rf OpenParEM-${VERSION}-bin_${CURRENTDATE}.tar OpenParEM-${VERSION}/bin/OpenParEM2D* OpenParEM-${VERSION}/bin/OpenParEM3D* OpenParEM-${VERSION}/bin/process2D* OpenParEM-${VERSION}/bin/process3D* OpenParEM-${VERSION}/bin/simplify2D* OpenParEM-${VERSION}/bin/simplify3D* OpenParEM-${VERSION}/bin/builder* OpenParEM-${VERSION}/bin/mpirun OpenParEM-${VERSION}/bin/ort*
+
+gzip OpenParEM-${VERSION}-bin_${CURRENTDATE}.tar
 
