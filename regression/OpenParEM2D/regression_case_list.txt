@@ -1,4 +1,4 @@
-.regression test cases for OpenParEM2D
+# regression test cases for OpenParEM2D
 OpenParEM2D
 
 ./coax_modal/coax.proj 5
