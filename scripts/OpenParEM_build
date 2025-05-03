@@ -124,7 +124,7 @@ unpack_and_enter() {
 
    # check for existence
    if [ ! -f "$FILE" ]; then
-      echo "ERROR: distribution \"""$FILE""\" not found"
+      echo "ERROR: distribution \"""$FILE""\" not found in $PWD"
       exit 1
    fi
 
