@@ -114,6 +114,7 @@ Missing tools can be installed using the system's package manager.  For Linux
 versions using the Debian package manager APT (used on Debian, Ubuntu, Linux Mint,
 and others), the commands are
 
+   $ sudo apt update
    $ sudo apt-get install make
    $ sudo apt-get install g++
    $ sudo apt-get install gfortran
@@ -121,6 +122,7 @@ and others), the commands are
 
 For Redhat RHEL and Amazon AMI, the yum package manager is used with the commands:
 
+   $ sudo yum update
    $ sudo yum install make
    $ sudo yum install g++
    $ sudo yum install gfortran
@@ -128,6 +130,7 @@ For Redhat RHEL and Amazon AMI, the yum package manager is used with the command
 
 For Suse SLES, the zypper package manager is used with the commands:
 
+   $ sudo zypper update
    $ sudo zypper install make
    $ sudo zypper install gcc-c++
    $ sudo zypper install gcc-fortran
