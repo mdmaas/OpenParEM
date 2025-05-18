@@ -145,7 +145,7 @@ void isOpenParEM2Dreachable ()
 }
 
 void load_project_file (const char *projFile, struct projectData *defaultData, struct projectData *projData,
-                        char *lockfile, chrono::system_clock::time_point job_start_time)
+                        char *lockfile, chrono::steady_clock::time_point job_start_time)
 {
    prefix(); PetscPrintf(PETSC_COMM_WORLD,"   loading project file \"%s\"\n",projFile);
 
@@ -243,7 +243,7 @@ int main(int argc, char *argv[])
    struct applicationContext appCtx;
    PetscPushErrorHandler(errorHandler,(struct applicationContext *) &appCtx);
 
-   chrono::system_clock::time_point job_start_time=chrono::system_clock::now();
+   chrono::steady_clock::time_point job_start_time=chrono::steady_clock::now();
 
    // parse inputs
    int printHelp=0;
@@ -447,7 +447,7 @@ int main(int argc, char *argv[])
          if (iterate) {prefix(); PetscPrintf(PETSC_COMM_WORLD,"   Iteration %d ...\n",iteration+1);}
          else         {prefix(); PetscPrintf(PETSC_COMM_WORLD,"   Using existing mesh ...\n");}
 
-         chrono::system_clock::time_point fem_setup_start_time=chrono::system_clock::now();
+         chrono::steady_clock::time_point fem_setup_start_time=chrono::steady_clock::now();
 
          if (print_mesh_quality_message (pmesh,&projData)) exit_job_on_error (job_start_time,lockfile,true);
          prefix(); PetscPrintf(PETSC_COMM_WORLD,"      mesh size: %d\n",getGlobalNE(pmesh));
@@ -483,7 +483,7 @@ int main(int argc, char *argv[])
          boundaryDatabase.calculateLineIntegrals(pmesh,fem);
          boundaryDatabase.alignDirections(pmesh,fem);
 
-         chrono::system_clock::time_point fem_setup_end_time=chrono::system_clock::now();
+         chrono::steady_clock::time_point fem_setup_end_time=chrono::steady_clock::now();
 
          Result *result=new Result();
          result->set("S",frequency,shortestPerWavelength,longestPerWavelength,iteration,pmesh);
@@ -496,7 +496,7 @@ int main(int argc, char *argv[])
          resultDatabase.set_SportCount(SportCount);
          while (drivingSet <= SportCount) {
 
-            chrono::system_clock::time_point solve_start_time=chrono::system_clock::now();
+            chrono::steady_clock::time_point solve_start_time=chrono::steady_clock::now();
 
             stringstream setname;
             prefix(); PetscPrintf(PETSC_COMM_WORLD,"      Driving %s %d ...\n",boundaryDatabase.get_drivingSetName().c_str(),drivingSet);
@@ -521,26 +521,26 @@ int main(int argc, char *argv[])
                exit_job_on_error (job_start_time,lockfile,true);
             }
 
-            chrono::system_clock::time_point solve_end_time=chrono::system_clock::now();
+            chrono::steady_clock::time_point solve_end_time=chrono::steady_clock::now();
             result->set_solve_time(elapsed_time(solve_start_time,solve_end_time));
             result->set_fem_setup_time(elapsed_time(fem_setup_start_time,fem_setup_end_time));
 
             if (iterate) {
-               chrono::system_clock::time_point mesh_error_start_time=chrono::system_clock::now();
+               chrono::steady_clock::time_point mesh_error_start_time=chrono::steady_clock::now();
                prefix(); PetscPrintf(PETSC_COMM_WORLD,"         calculating mesh errors ...\n");
                double maxMeshError;
                if (fem->calculateMeshErrors(&projData,&boundaryDatabase,&Inv_mur,&maxMeshError)) {
                   exit_job_on_error (job_start_time,lockfile,true);
                }
                result->set_maxAbsoluteError(maxMeshError);
-               chrono::system_clock::time_point mesh_error_end_time=chrono::system_clock::now();
+               chrono::steady_clock::time_point mesh_error_end_time=chrono::steady_clock::now();
                result->set_mesh_error_time(elapsed_time(mesh_error_start_time,mesh_error_end_time));
             }
 
             if (saveFieldsHeader) {fem->saveFieldValuesHeader(&projData); saveFieldsHeader=false;}
             fem->saveFieldValues(&projData,pmesh,iteration,drivingSet);
 
-            chrono::system_clock::time_point radiation_start_time=chrono::system_clock::now();
+            chrono::steady_clock::time_point radiation_start_time=chrono::steady_clock::now();
             if (projData.inputAntennaPatternsCount > 0) {
                result->set_hasRadiation(true);
                prefix(); PetscPrintf(PETSC_COMM_WORLD,"         radiation boundary currents ...\n");
@@ -548,7 +548,7 @@ int main(int argc, char *argv[])
                prefix(); PetscPrintf(PETSC_COMM_WORLD,"         radiation patterns ...\n");
                fem->calculateRadiationPatterns(drivingSet,acceptedPower,iteration,&boundaryDatabase,&patternDatabase);
             }
-            chrono::system_clock::time_point radiation_end_time=chrono::system_clock::now();
+            chrono::steady_clock::time_point radiation_end_time=chrono::steady_clock::now();
             result->set_radiation_time(elapsed_time(radiation_start_time,radiation_end_time));
 
             drivingSet++;
@@ -589,7 +589,7 @@ int main(int argc, char *argv[])
          }
 
          if (iterate) {
-            chrono::system_clock::time_point refine_start_time=chrono::system_clock::now();
+            chrono::steady_clock::time_point refine_start_time=chrono::steady_clock::now();
 
             // mark as having iterations
             result->set_isRefined();
@@ -628,7 +628,7 @@ int main(int argc, char *argv[])
                }
             }
 
-            chrono::system_clock::time_point refine_end_time=chrono::system_clock::now();
+            chrono::steady_clock::time_point refine_end_time=chrono::steady_clock::now();
             resultDatabase.set_refine_time(elapsed_time(refine_start_time,refine_end_time),frequency,iteration+1);
          }
 
@@ -651,7 +651,7 @@ int main(int argc, char *argv[])
          boundaryDatabase.reset();
 
         // for benchmarking
-        //chrono::system_clock::time_point iteration_end_time=chrono::system_clock::now();
+        //chrono::steady_clock::time_point iteration_end_time=chrono::steady_clock::now();
         //if (rank == 0) cout << "CUMMULATIVETIME," << iteration+1 << "," << elapsed_time(job_start_time,iteration_end_time) << endl;
 
          ++iteration;
@@ -695,7 +695,7 @@ int main(int argc, char *argv[])
    write_attributes (baseName,pmesh);
    delete pmesh;
 
-   chrono::system_clock::time_point job_end_time=chrono::system_clock::now();
+   chrono::steady_clock::time_point job_end_time=chrono::steady_clock::now();
    resultDatabase.set_solve_time(elapsed_time(job_start_time,job_end_time));
    resultDatabase.save(&projData);
 

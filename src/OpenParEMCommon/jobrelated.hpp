@@ -35,11 +35,11 @@ using namespace std;
 
 extern "C" void prefix ();
 
-void exit_job_on_error (chrono::system_clock::time_point, const char *, bool);
+void exit_job_on_error (chrono::steady_clock::time_point, const char *, bool);
 char* create_lock_file (const char *);
 void remove_lock_file (const char *);
 void delete_file (const char *, string, string);
-double elapsed_time (chrono::system_clock::time_point, chrono::system_clock::time_point);
+double elapsed_time (chrono::steady_clock::time_point, chrono::steady_clock::time_point);
 
 #endif
 

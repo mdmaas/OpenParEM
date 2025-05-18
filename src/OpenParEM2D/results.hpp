@@ -44,26 +44,26 @@ class run_statistics
       double error;
       int meshSize;
       int matrixSize;
-      chrono::system_clock::time_point start_time;
-      chrono::system_clock::time_point end_solve_time;
-      chrono::system_clock::time_point end_refine_time;
+      chrono::steady_clock::time_point start_time;
+      chrono::steady_clock::time_point end_solve_time;
+      chrono::steady_clock::time_point end_refine_time;
       bool converged;
    public:
       double get_error() {return error;}
       int get_meshSize() {return meshSize;}
       int get_matrixSize() {return matrixSize;}
-      chrono::system_clock::time_point get_start_time() {return start_time;}
-      chrono::system_clock::time_point get_end_solve_time() {return end_solve_time;}
-      chrono::system_clock::time_point get_end_refine_time() {return end_refine_time;}
+      chrono::steady_clock::time_point get_start_time() {return start_time;}
+      chrono::steady_clock::time_point get_end_solve_time() {return end_solve_time;}
+      chrono::steady_clock::time_point get_end_refine_time() {return end_refine_time;}
       chrono::duration<double> get_solve_elapsed() {return end_solve_time-start_time;}
       chrono::duration<double> get_refine_elapsed() {return end_refine_time-end_solve_time;}
       bool get_converged() {return converged;}
       void set_error(double error_) {error=error_;}
       void set_meshSize(int meshSize_) {meshSize=meshSize_;}
       void set_matrixSize(int matrixSize_) {matrixSize=matrixSize_;}
-      void set_start_time(chrono::system_clock::time_point start_time_) {start_time=start_time_;}
-      void set_end_solve_time(chrono::system_clock::time_point end_solve_time_) {end_solve_time=end_solve_time_;}
-      void set_end_refine_time(chrono::system_clock::time_point end_refine_time_) {end_refine_time=end_refine_time_;}
+      void set_start_time(chrono::steady_clock::time_point start_time_) {start_time=start_time_;}
+      void set_end_solve_time(chrono::steady_clock::time_point end_solve_time_) {end_solve_time=end_solve_time_;}
+      void set_end_refine_time(chrono::steady_clock::time_point end_refine_time_) {end_refine_time=end_refine_time_;}
       void set_converged(bool converged_) {converged=converged_;}
 };
 
@@ -93,7 +93,7 @@ class Result
       void set_frequency (double frequency_) {frequency=frequency_;}
       void set_modeCount (int modeCount_) {modeCount=modeCount_;}
       void set_modalImpedanceCalculation (int modalImpedanceCalculation_) {modalImpedanceCalculation=modalImpedanceCalculation_;}
-      void set_end_refine_time (chrono::system_clock::time_point end_refine_time_) {run_stats->set_end_refine_time(end_refine_time_);}
+      void set_end_refine_time (chrono::steady_clock::time_point end_refine_time_) {run_stats->set_end_refine_time(end_refine_time_);}
       void push_gamma (complex<double> gamma_) {gamma.push_back(gamma_);}
       void push_alpha_perturbation (double alpha_perturbation_) {alpha_perturbation.push_back(alpha_perturbation_);}
       void push_Pz (complex<double> Pz_) {Pz.push_back(Pz_);}

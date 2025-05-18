@@ -16,6 +16,7 @@ Redhat RHEL 9.5 [the binary is compiled on RHEL 9.5]
 Debian 12
 Suse SLES 15-SP6
 Amazon 2023 AMI
+Windows 11 using WSL2 and Ubuntu 24.04 LTS
 
 The binary fails to run on the following systems:
 Suse SLES 12-SP5 - The GLIBC binary in the Suse system is too old.
@@ -88,6 +89,7 @@ Ubuntu 24.04.2 LTS
 Redhat RHEL 9.5 
 Debian 12
 Amazon 2023 AMI
+Windows 11 using WSL2 and Ubuntu 24.04 LTS
 
 Compililation fails for the following operating systems:
 

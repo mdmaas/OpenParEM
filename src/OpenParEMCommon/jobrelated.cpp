@@ -20,7 +20,7 @@
 
 #include "jobrelated.hpp"
 
-void exit_job_on_error (chrono::system_clock::time_point job_start_time, const char *lockfile, bool removeLock)
+void exit_job_on_error (chrono::steady_clock::time_point job_start_time, const char *lockfile, bool removeLock)
 {
    PetscMPIInt rank;
    MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
@@ -34,7 +34,7 @@ void exit_job_on_error (chrono::system_clock::time_point job_start_time, const c
       }
    }
 
-   chrono::system_clock::time_point job_end_time=chrono::system_clock::now();
+   chrono::steady_clock::time_point job_end_time=chrono::steady_clock::now();
    chrono::duration<double> elapsed = job_end_time - job_start_time;
    prefix(); PetscPrintf(PETSC_COMM_WORLD,"Elapsed time: %g s\n",elapsed.count());
 
@@ -129,7 +129,7 @@ void delete_file (const char *baseName, string pre, string post)
    }
 }
 
-double elapsed_time (chrono::system_clock::time_point start, chrono::system_clock::time_point finish)
+double elapsed_time (chrono::steady_clock::time_point start, chrono::steady_clock::time_point finish)
 {
    chrono::duration<double> elapsed=finish-start;
    return elapsed.count();

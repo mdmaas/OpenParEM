@@ -83,7 +83,7 @@ class BoundaryDatabase;
 class Result;
 class fem3D;
 
-double elapsed_time (chrono::system_clock::time_point, chrono::system_clock::time_point);
+double elapsed_time (chrono::steady_clock::time_point, chrono::steady_clock::time_point);
 bool isClose (double, double);
 
 class Gamma

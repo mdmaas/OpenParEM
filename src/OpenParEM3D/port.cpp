@@ -7145,8 +7145,8 @@ bool BoundaryDatabase::solvePorts (int mesh_order, ParMesh *pmesh, vector<ParSub
    bool fail=false;
    PetscMPIInt rank;
    chrono::duration<double> elapsed;
-   chrono::system_clock::time_point start;
-   chrono::system_clock::time_point current;
+   chrono::steady_clock::time_point start;
+   chrono::steady_clock::time_point current;
    MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
 
    if (create2Dmeshes(mesh_order,pmesh,parSubMeshesPort)) {fail=true; return fail;}
@@ -7168,9 +7168,9 @@ bool BoundaryDatabase::solvePorts (int mesh_order, ParMesh *pmesh, vector<ParSub
       // wait for the lock file to disappear
       stringstream ssLock;
       ssLock << tempDirectory << "/" << "S" << portList[i]->get_name() << "/" << "." << portList[i]->get_name() << ".lock";
-      start=chrono::system_clock::now();
+      start=chrono::steady_clock::now();
       while (std::filesystem::exists(ssLock.str().c_str())) {
-         current=chrono::system_clock::now();
+         current=chrono::steady_clock::now();
          elapsed=current-start;
          if (elapsed.count() > 60) {
             prefix(); PetscPrintf(PETSC_COMM_WORLD,"ERROR3118: OpenParEM2D lock file is present, implying a failed 2D port simulation.\n");

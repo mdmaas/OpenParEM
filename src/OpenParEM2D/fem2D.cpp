@@ -2604,7 +2604,7 @@ void fem2D::writeInitialGuess ()
 }
 
 Result* fem2D::updateResults(ResultDatabase *resultDatabase, ConvergenceDatabase *convergenceDatabase,
-                          chrono::system_clock::time_point solve_start_time, chrono::system_clock::time_point solve_end_time)
+                          chrono::steady_clock::time_point solve_start_time, chrono::steady_clock::time_point solve_end_time)
 {
    Result *result=new Result();
 

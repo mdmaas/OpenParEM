@@ -31,7 +31,7 @@ using namespace std;
 PetscErrorCode errorHandler (MPI_Comm, int, const char *, const char *, PetscErrorCode, PetscErrorType, const char *, void *);
 
 struct applicationContext {
-   chrono::system_clock::time_point job_start_time;
+   chrono::steady_clock::time_point job_start_time;
    const char *lockfile;
    char *prefix_text;
 };

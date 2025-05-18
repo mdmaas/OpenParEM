@@ -20,7 +20,7 @@
 
 #include "petscErrorHandler.hpp"
 
-void exit_job_on_error (chrono::system_clock::time_point, const char *, bool);
+void exit_job_on_error (chrono::steady_clock::time_point, const char *, bool);
 
 PetscErrorCode errorHandler (MPI_Comm comm, int line, const char *fun, const char *file, PetscErrorCode n, PetscErrorType p, const char *mess, void *ctx)
 {

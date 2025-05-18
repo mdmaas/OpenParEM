@@ -236,7 +236,7 @@ void show_memory (int show, string space)
    }
 }
 
-void load_project_file (const char *projFile, struct projectData *defaultData, struct projectData *projData, char *lockfile, chrono::system_clock::time_point job_start_time)
+void load_project_file (const char *projFile, struct projectData *defaultData, struct projectData *projData, char *lockfile, chrono::steady_clock::time_point job_start_time)
 {
    prefix(); PetscPrintf(PETSC_COMM_WORLD,"   loading project file \"%s\"\n",projFile);
 
@@ -266,7 +266,7 @@ void delete_stale_files (const char *baseName)
    MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-char* create_temp_directory (struct projectData *projData, chrono::system_clock::time_point job_start_time, char *lockfile)
+char* create_temp_directory (struct projectData *projData, chrono::steady_clock::time_point job_start_time, char *lockfile)
 {
    PetscMPIInt rank;
    MPI_Comm_rank(PETSC_COMM_WORLD, &rank);
@@ -329,7 +329,7 @@ int main(int argc, char *argv[])
    struct applicationContext appCtx;
    PetscPushErrorHandler(errorHandler,(struct applicationContext *) &appCtx);
 
-   chrono::system_clock::time_point job_start_time=chrono::system_clock::now();
+   chrono::steady_clock::time_point job_start_time=chrono::steady_clock::now();
 
    // parse inputs
    int printHelp=0;
@@ -536,7 +536,7 @@ int main(int argc, char *argv[])
       int iteration=0;
       bool iterate=true;
       while (iterate) {
-         chrono::system_clock::time_point solve_start_time=chrono::system_clock::now();
+         chrono::steady_clock::time_point solve_start_time=chrono::steady_clock::now();
 
          if (refineMesh) {prefix(); PetscPrintf(PETSC_COMM_WORLD,"   Iteration %d ...\n",iteration+1);}
          else {
@@ -587,7 +587,7 @@ int main(int argc, char *argv[])
             fem->calculateFieldPoints(&fieldPointDatabase);
             fem->saveTiTv();
             fem->saveParaView();
-            chrono::system_clock::time_point solve_end_time=chrono::system_clock::now();
+            chrono::steady_clock::time_point solve_end_time=chrono::steady_clock::now();
             Result *result=fem->updateResults(&resultDatabase,convergenceDatabase,solve_start_time,solve_end_time);
 
             chrono::duration<double> elapsed = solve_end_time - solve_start_time;
@@ -624,7 +624,7 @@ int main(int argc, char *argv[])
 
             prefix(); PetscPrintf(PETSC_COMM_WORLD,"      Finished\n");
 
-            chrono::system_clock::time_point iteration_end_time=chrono::system_clock::now();
+            chrono::steady_clock::time_point iteration_end_time=chrono::steady_clock::now();
             elapsed = iteration_end_time - job_start_time;
             prefix(); PetscPrintf(PETSC_COMM_WORLD,"      cummulative elapsed time: %g s\n",elapsed.count());
 
@@ -685,7 +685,7 @@ int main(int argc, char *argv[])
    if (alphaList) free(alphaList);
    if (betaList) free(betaList);
 
-   chrono::system_clock::time_point job_end_time=chrono::system_clock::now();
+   chrono::steady_clock::time_point job_end_time=chrono::steady_clock::now();
    chrono::duration<double> elapsed = job_end_time - job_start_time;
    prefix(); PetscPrintf(PETSC_COMM_WORLD,"Elapsed time: %g s\n",elapsed.count());
 

@@ -278,7 +278,7 @@ class fem2D {
       bool calculatePerturbationalLoss (BoundaryDatabase *, BorderDatabase *, MaterialDatabase *);
       void calculateFieldPoints (FieldPointDatabase *);
       void saveParaView ();
-      Result* updateResults (ResultDatabase *, ConvergenceDatabase *, chrono::system_clock::time_point, chrono::system_clock::time_point);
+      Result* updateResults (ResultDatabase *, ConvergenceDatabase *, chrono::steady_clock::time_point, chrono::steady_clock::time_point);
       int get_ess_tdof_size_ND () {return ess_tdof_size_ND;}
       int get_ess_tdof_size_H1 () {return ess_tdof_size_H1;}
       string get_temporaryDirectory() {return temporaryDirectory;}
