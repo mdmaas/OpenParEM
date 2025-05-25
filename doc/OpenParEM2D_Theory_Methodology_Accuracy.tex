@@ -659,7 +659,7 @@ Plots of the dominant mode at 10~GHz are shown in Fig.~\ref{fig:partial_field_po
 
 \subsection{Coaxial Waveguide}
 
-A lossless coaxial waveguide is simulated for comparison against exact results.  The project can be found in the OpenParEM distribution in \texttt{regression/OpenParEM2D/coaxEighth\_study}.  The coax has an inner conductor radius of 0.406~mm, an outer radius of 1.48~mm, and a dielectric with $\epsilon_r=2.26$.  The structure is drawn in FreeCAD using polygons with 10 segments per 45$^{\circ}$. Using symmetry with PMC boundaries, 1/8 of the structure is simulated.  Assuming perfect circles, the exact impedance is 51.5874640385028~$\Omega$.  Since this is a lossless TEM transmission line, the exact value for $\beta/k_{\circ}=\sqrt{2.26}$.
+A lossless coaxial waveguide is simulated for comparison against exact results.  The project can be found in the OpenParEM distribution in \texttt{regression/OpenParEM2D/coaxEighth\_study}.  The coax has an inner conductor radius of 0.406~mm, an outer radius of 1.48~mm, and a dielectric with $\epsilon_r=2.26$.  The structure is drawn in FreeCAD\cite{FreeCAD} using polygons with 10 segments per 45$^{\circ}$. Using symmetry with PMC boundaries, 1/8 of the structure is simulated.  Assuming perfect circles, the exact impedance is 51.5874640385028~$\Omega$.  Since this is a lossless TEM transmission line, the exact value for $\beta/k_{\circ}=\sqrt{2.26}$.
 
 The simulation uses 2$^{\textnormal{nd}}$-order finite elements with adaptive refinement stepping down in frequency from 10,000~GHz to 10~MHz in 10$\times$ steps to avoid potential convergence issues at low frequencies.  Since the mesh is refined multiple times, the relative tolerance is set to a somewhat loose value of $10^{-5}$ converging on $|Z_{\circ}|$.
 
@@ -814,11 +814,13 @@ Results are compared with those scaled off the plot in \cite{Simonovich} in Fig.
 
 \bibitem{Harrington} Roger E. Harrington, \textit{Time-Harmonic Electromagnetic Fields}, McGraw-Hill, 1961.
 
+\bibitem{FreeCAD} \verb+https://freecad.org+ version 0.21
+
 \bibitem{Olyslager} Frank Olyslager, Daniel De Zutter, and Krist Blomme, “Rigorous analysis of the propagation characteristics of general lossless and lossy multiconductor transmission lines in multilayered media”, \textit{IEEE Trans. Microwave Theory and Techniques}, vol. 41, no. 1, Jan. 1993, pp. 79-88.
 
 \bibitem{gmsh} C. Geuzaine and J.-F. Remacle, "Gmsh: a three-dimensional finite element mesh generator with built-in pre- and post-processing facilities," \textit{International Journal for Numerical Methods in Engineering}, 79(11), pp. 1309-1331, 2009.
 
-\bibitem{gmshweb} \verb+https:\\gmsh.info+
+\bibitem{gmshweb} \verb+https:\\gmsh.info+ version 4.13
 
 \bibitem{Simonovich} Lambert Simonovich, “A practical method to model effective permittivity and phase delay due to conductor surface roughness”, \textit{2017 DesignCon}.
 
