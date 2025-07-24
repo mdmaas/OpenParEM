@@ -221,7 +221,7 @@ wrap_executable() {
 
    HAS_COMPILED_OPENMPI=$2
 
-   cd ../bin
+   cd "$install_path/bin"
 
       if [ $? -ne 0 ]; then
          echo "ERROR: failed to change to the bin directory"
@@ -267,7 +267,7 @@ wrap_executable() {
          exit 1
       fi
 
-   cd ../scripts
+   cd "$scripts_dir"
 }
 
 #----------------------------------------------------
