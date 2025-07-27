@@ -1416,7 +1416,7 @@ echo "# OpenParEM_build: creating wrappers for executables"
 echo "#------------------------------------------------------------------------------------"
 
 # see if a compiled version of Open MPI exists
-cd ../bin
+cd "$install_path/bin"
    if [ $? -ne 0 ]; then
       echo "OpenParEM_ERROR: failed to change to bin directory."
       exit 1
@@ -1432,7 +1432,7 @@ cd ../bin
       HAS_ORTERUNBIN=1
    fi
 
-cd ../scripts
+cd "$scripts_dir"
 
 
 if [ "$with_OpenParEM" = "1" ]; then
