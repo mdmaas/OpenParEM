@@ -1450,7 +1450,7 @@ if [ "$HAS_ORTERUN" = "1" ]; then
       wrap_executable orterun $HAS_ORTERUN
    fi
 else
-   cd ../bin
+   cd "$install_path/bin"
    if [ $? -ne 0 ]; then
       echo "OpenParEM_ERROR: failed to change to bin directory."
       exit 1
@@ -1470,7 +1470,7 @@ else
 
    fi
 
-   cd ../scripts
+   cd "$scripts_dir"
 fi
 
 # finish up with elapsed time
